@@ -1,0 +1,15 @@
+<h3>All Handles</h3>
+<table class="handle-list all-handles">
+  <thead>
+    <tr>
+      <th>Handle</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let handle of handles" class="handle-row">
+      <td class="handle-name">{{handle.name}}</td>
+      <td class="handle-type">{{handle.type}}</td>
+    </tr>
+  </tbody>
+</table>

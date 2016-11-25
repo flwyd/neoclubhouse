@@ -5,10 +5,13 @@ import { HttpModule } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
+import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
+import { HandleService } from './handle.service';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HandleCheckerComponent
   ],
   imports: [
     BrowserModule,
@@ -16,7 +19,9 @@ import { AppComponent } from './app.component';
     HttpModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [
+    HandleService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

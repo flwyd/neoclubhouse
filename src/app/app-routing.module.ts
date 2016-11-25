@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
+
 const routes: Routes = [
-  {
-    path: '',
-    children: []
-  }
+  { path: '', children: [] },
+  { path: 'handle-checker', component: HandleCheckerComponent },
 ];
 
 @NgModule({
