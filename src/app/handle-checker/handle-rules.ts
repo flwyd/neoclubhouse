@@ -11,6 +11,9 @@ export class MinLengthRule implements HandleRule {
 
   check(name: string): Promise<HandleConflict[]> {
     let result = [];
+    if (name.trim().length === 0) {
+      return Promise.resolve(result);
+    }
     if (!name.match(/[a-z]/i)) {
       result.push(new HandleConflict(name, 'should have letters', 'medium', this.id));
     } else if (name.length < 3 && !name.match(/^[A-Z]{2}$/)) {
@@ -64,9 +67,12 @@ export class SubstringRule implements HandleRule {
   }
 
   check(candidateName: string): Promise<HandleConflict[]> {
+    let name = this.clean(candidateName);
+    if (name.length === 0) {
+      return Promise.resolve([]);
+    }
     return this.cleaned.then((cleaned) => {
       let result = [];
-      let name = this.clean(candidateName);
       for (let targetName of Object.keys(cleaned)) {
         let targetHandle = cleaned[targetName];
         if (name.length === targetName.length) {
