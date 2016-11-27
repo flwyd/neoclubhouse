@@ -6,12 +6,14 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
+import { ALL_HANDLE_RULES } from './handle-rule';
+import { MinLengthRule, FccRule, SubstringRule } from './handle-rules';
 import { HandleService } from './handle.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HandleCheckerComponent
+    HandleCheckerComponent,
   ],
   imports: [
     BrowserModule,
@@ -21,6 +23,13 @@ import { HandleService } from './handle.service';
   ],
   providers: [
     HandleService,
+    // TODO extract a HandleCheckerModule
+    MinLengthRule, FccRule, SubstringRule,
+    {
+      provide: ALL_HANDLE_RULES,
+      deps: [MinLengthRule, FccRule, SubstringRule],
+      useFactory: (letters, fcc, substring) => [letters, fcc, substring]
+    },
   ],
   bootstrap: [AppComponent]
 })

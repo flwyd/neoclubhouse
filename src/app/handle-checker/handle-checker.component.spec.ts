@@ -2,8 +2,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { HandleCheckerComponent } from './handle-checker.component';
+import { ALL_HANDLE_RULES } from '../handle-rule';
+import { MinLengthRule, FccRule, SubstringRule } from '../handle-rules';
 import { HandleService } from '../handle.service';
 
 describe('HandleCheckerComponent', () => {
@@ -12,8 +15,17 @@ describe('HandleCheckerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [ FormsModule ],
       declarations: [ HandleCheckerComponent ],
-      providers: [ HandleService ], // TODO make a mock impl
+      providers: [
+        HandleService,
+        MinLengthRule, FccRule, SubstringRule,
+        {
+          provide: ALL_HANDLE_RULES,
+          deps: [MinLengthRule, FccRule, SubstringRule],
+          useFactory: (letters, fcc, substring) => [letters, fcc, substring]
+        },
+      ], // TODO make a mock HandleService impl
     })
     .compileComponents();
   }));
