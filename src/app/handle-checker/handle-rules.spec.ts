@@ -3,6 +3,7 @@ import { TestBed, async, inject } from '@angular/core/testing';
 import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
 import { MinLengthRule, FccRule, SubstringRule } from './handle-rules';
 import { HandleService } from './handle.service';
+import { MockHandleService } from './handle.service.mock';
 
 describe('Handle rules', () => {
   const expectNoConflicts = (rule, name) => {
@@ -14,7 +15,7 @@ describe('Handle rules', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        HandleService, // TODO implement a fake
+        {provide: HandleService, useClass: MockHandleService},
         MinLengthRule, FccRule, SubstringRule, // TODO HandleCheckerModule
         {
           provide: ALL_HANDLE_RULES,

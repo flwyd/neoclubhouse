@@ -1,6 +1,6 @@
 import { Handle } from './handle';
 
-export const HANDLES: Handle[] = [
+export const PHONETIC_ALPHABET: Handle[] = [
   { name: 'Alfa', type: 'phonetic-alphabet' },
   { name: 'Bravo', type: 'phonetic-alphabet' },
   { name: 'Charlie', type: 'phonetic-alphabet' },

@@ -8,6 +8,7 @@ import { HandleCheckerComponent } from './handle-checker.component';
 import { ALL_HANDLE_RULES } from './handle-rule';
 import { MinLengthRule, FccRule, SubstringRule } from './handle-rules';
 import { HandleService } from './handle.service';
+import { MockHandleService } from './handle.service.mock';
 
 describe('HandleCheckerComponent', () => {
   let component: HandleCheckerComponent;
@@ -18,7 +19,7 @@ describe('HandleCheckerComponent', () => {
       imports: [ FormsModule ],
       declarations: [ HandleCheckerComponent ],
       providers: [
-        HandleService,
+        {provide: HandleService, useClass: MockHandleService},
         MinLengthRule, FccRule, SubstringRule,
         {
           provide: ALL_HANDLE_RULES,
