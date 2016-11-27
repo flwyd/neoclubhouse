@@ -1,9 +1,9 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 
-import { Handle } from '../handle';
-import { HandleConflict } from '../handle-conflict';
-import { ALL_HANDLE_RULES, HandleRule } from '../handle-rule';
-import { HandleService } from '../handle.service';
+import { Handle } from './handle';
+import { HandleConflict } from './handle-conflict';
+import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
+import { HandleService } from './handle.service';
 
 @Component({
   selector: 'app-handle-checker',

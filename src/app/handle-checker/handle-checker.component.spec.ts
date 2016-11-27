@@ -5,9 +5,9 @@ import { DebugElement } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { HandleCheckerComponent } from './handle-checker.component';
-import { ALL_HANDLE_RULES } from '../handle-rule';
-import { MinLengthRule, FccRule, SubstringRule } from '../handle-rules';
-import { HandleService } from '../handle.service';
+import { ALL_HANDLE_RULES } from './handle-rule';
+import { MinLengthRule, FccRule, SubstringRule } from './handle-rules';
+import { HandleService } from './handle.service';
 
 describe('HandleCheckerComponent', () => {
   let component: HandleCheckerComponent;
