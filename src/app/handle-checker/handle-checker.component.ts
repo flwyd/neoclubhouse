@@ -36,7 +36,7 @@ export class HandleCheckerComponent implements OnInit {
         Array.prototype.push.apply(conflicts, results);
       });
     }
-    this.checkedNames.push({name: name, conflicts: conflicts});
+    this.checkedNames.unshift({name: name, conflicts: conflicts});
   }
 
   conflictTip(conflict: HandleConflict) {
