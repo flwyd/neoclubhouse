@@ -1,7 +1,7 @@
 <h2 class="component-title">Handle Checker</h2>
 <form (submit)="checkCurrentName()">
-  <input [(ngModel)]="currentName" name="name" type="text"
-      id="handle-check-input" placeholder="Try a handle">
+  <input #handleCheckInput [(ngModel)]="currentName"
+      name="name" type="text" id="handle-check-input" placeholder="Try a handle">
   <button type="submit">Check handle</button>
 </form>
 <h3>Checked Handles</h3>
@@ -37,7 +37,10 @@
   </thead>
   <tbody>
     <tr *ngFor="let handle of handles" class="handle-row">
-      <td class="handle-name">{{handle.name}}</td>
+      <td class="handle-name"
+          (click)="currentName = handle.name; handleCheckInput.scrollIntoView()">
+        {{handle.name}}
+      </td>
       <td class="handle-type">{{handle.type}}</td>
     </tr>
   </tbody>
