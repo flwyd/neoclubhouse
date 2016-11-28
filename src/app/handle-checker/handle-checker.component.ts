@@ -46,9 +46,14 @@ export class HandleCheckerComponent implements OnInit {
   }
 
   conflictClasses(conflict: HandleConflict) {
-    return [
+    let classes = [
       `handle-conflict-priority-${conflict.priority}`,
       `handle-conflict-rule-${conflict.ruleId}`,
     ];
+    if (conflict.conflict) {
+      let handleType = conflict.conflict.type.toLowerCase().replace(/\W+/, '-');
+      classes.push(`handle-conflict-type-${handleType}`);
+    }
+    return classes;
   }
 }
