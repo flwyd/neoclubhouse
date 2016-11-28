@@ -1,0 +1,49 @@
+@import '../constants.scss';
+
+.app-bar {
+  background-color: $khaki;
+  margin-bottom: 1em;
+  padding: {
+    left: 1ex;
+    right: 1ex;
+  }
+
+  h1 {
+    display: inline;
+  }
+
+  nav {
+    display: inline;
+    a {
+      color: blue;
+      display: inline-block;
+      margin: 2ex;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &.active {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.home-link {
+  color: black;
+  text-decoration: none;
+}
+
+.main-content {
+  padding: {
+    left: 1em;
+    right: 1em;
+  }
+}
+
+footer {
+  padding: 1em;
+  text-align: center;
+}

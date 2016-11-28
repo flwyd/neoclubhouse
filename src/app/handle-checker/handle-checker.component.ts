@@ -37,6 +37,7 @@ export class HandleCheckerComponent implements OnInit {
       });
     }
     this.checkedNames.unshift({name: name, conflicts: conflicts});
+    this.currentName = '';
   }
 
   conflictTip(conflict: HandleConflict) {

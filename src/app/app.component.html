@@ -1,7 +1,15 @@
-<h1>
-  {{title}}
-</h1>
-<nav>
-  <a routerLink="/handle-checker" routerLinkActive="active">Handle Checker</a>
-</nav>
-<router-outlet></router-outlet>
+<header class="app-bar">
+  <h1>
+    <a routerLink="/" class="home-link">{{title}}</a>
+  </h1>
+  <nav>
+    <a routerLink="/handle-checker" routerLinkActive="active">Handle checker</a>
+  </nav>
+</header>
+<div class="main-content">
+  <router-outlet></router-outlet>
+</div>
+<footer>
+  Neoclubhouse is still experimental.  Most features are available in the
+  <a href="/">Ranger Secret Clubhouse</a>.
+</footer>

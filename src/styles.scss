@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* TODO Use a library like angular-material or bootstrap. */
+
+@import 'constants.scss';
+
+body, html {
+  background-color: $khaki_light;
+  margin: 0;
+  padding: 0;
+}

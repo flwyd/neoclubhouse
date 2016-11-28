@@ -1,4 +1,32 @@
+table.checked-handles {
+  border-collapse: collapse;
+
+  th {
+    padding: 0.5ex;
+    text-align: left;
+  }
+
+  td {
+    border: thin solid;
+    padding: {
+      left: 0.5ex;
+      right: 0.5ex;
+    }
+  }
+}
+
 ul.handle-conflict-list {
+  padding-left: 0;
+
+  li {
+    display: inline-block;
+    margin-right: 2ex;
+
+    &:before {
+      content: "‣";
+    }
+  }
+
   .handle-conflict-priority-high {
     font-weight: bolder;
   }
