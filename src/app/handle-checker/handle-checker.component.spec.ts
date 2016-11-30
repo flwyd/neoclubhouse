@@ -49,8 +49,8 @@ describe('HandleCheckerComponent', () => {
       fixture.detectChanges();
       let names = table.queryAll(By.css('.handle-row .handle-name'));
       expect(names.length).toBe(26);
-      expect(names[0].nativeElement.textContent).toEqual('Alfa');
-      expect(names[25].nativeElement.textContent).toEqual('Zulu');
+      expect(names[0].nativeElement.textContent.trim()).toEqual('Alfa');
+      expect(names[25].nativeElement.textContent.trim()).toEqual('Zulu');
     });
   }));
 });
