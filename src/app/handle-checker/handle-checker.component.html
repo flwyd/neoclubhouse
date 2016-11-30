@@ -3,6 +3,12 @@
   <input #handleCheckInput [(ngModel)]="currentName"
       name="name" type="text" id="handle-check-input" placeholder="Try a handle">
   <button type="submit">Check handle</button>
+  <br />
+  Rules:
+  <label *ngFor="let state of ruleState" class="rule-select">
+    <input type="checkbox" name="rule_{{state.rule.id}}" [(ngModel)]="state.active">
+    {{state.name}}
+  </label>
 </form>
 <h3>Checked Handles</h3>
 <table class="handle-list checked-handles">
