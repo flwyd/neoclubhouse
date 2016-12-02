@@ -2,14 +2,16 @@ import { TestBed, async, inject } from '@angular/core/testing';
 
 import { HandleCheckerModule } from './handle-checker.module';
 import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
-import { MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistanceRule, AmericanSoundexRule } from './handle-rules';
+import { MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistanceRule,
+  AmericanSoundexRule, DoubleMetaphoneRule } from './handle-rules';
 import { HandleService } from './handle.service';
 import { MockHandleService } from './handle.service.mock';
 
 describe('Handle rules', () => {
+  const descriptionsFrom = (conflicts) => conflicts.map((c) => c.description);
   const expectNoConflicts = (rule, name) => {
     rule.check(name).then((conflicts) => {
-      expect(conflicts.length).toBe(0, `conflicts for ${name}`);
+      expect(conflicts.length).toBe(0, `conflicts for ${name}: ${descriptionsFrom(conflicts)}`);
     }).catch((e) => fail(e));
   };
 
@@ -27,10 +29,17 @@ describe('Handle rules', () => {
   describe('ALL_HANDLE_RULES', () => {
     it('should inject all rules', inject([ALL_HANDLE_RULES], (rules: HandleRule[]) => {
       expect(rules).toBeTruthy();
-      expect(rules.length).toBe(6);
-      let ids = rules.map((x) => x.id);
-      expect(ids).toEqual(jasmine.arrayContaining(
-        ['min-length', 'fcc', 'substring', 'edit-distance', 'american-soundex']));
+      expect(rules.length).toBe(7);
+      let ids = rules.map((x) => x.id).sort();
+      expect(ids).toEqual([
+        'american-soundex',
+        'double-metaphone',
+        'edit-distance',
+        'fcc',
+        'min-length',
+        'phonetic-alphabet',
+        'substring',
+      ]);
     }));
   });
 
@@ -239,15 +248,17 @@ describe('Handle rules', () => {
           let found = conflicts.find((x) => x.conflict.name === existing);
           expect(found).toBeTruthy(`${existing} not found in ${JSON.stringify(conflicts)}`);
           expect(found.candidateName).toBe(name);
-          expect(found.description).toMatch(`${name} may sound like ${existing}`);
+          expect(found.description).toMatch(`may sound like ${existing}`);
         }).catch((e) => fail(e));
       };
       checkit('alpha', 'Alfa');
       checkit('BRAVE', 'Bravo');
+      checkit('Charly', 'Charlie');
       checkit('FocsDryad', 'Foxtrot');
       checkit('Jeweled', 'Juliett');
       checkit('Mice', 'Mike');
       checkit('Nabenfir', 'November');
+      checkit('Popo', 'Papa');
       checkit('Sero', 'Sierra');
       checkit('Victoria', 'Victor');
       checkit('Wishco', 'Whiskey');
@@ -256,11 +267,53 @@ describe('Handle rules', () => {
     it('should not complain when soundex fails', async(inject([AmericanSoundexRule], (rule: HandleRule) => {
       expectNoConflicts(rule, 'Elfa');
       expectNoConflicts(rule, 'Shirley');
+      expectNoConflicts(rule, 'Tilde');
       expectNoConflicts(rule, 'Foxrot');
       expectNoConflicts(rule, 'Motel');
+      expectNoConflicts(rule, 'Nike');
       expectNoConflicts(rule, 'Quebec City');
       expectNoConflicts(rule, 'Unicorn');
       expectNoConflicts(rule, 'Vitcor');
+      expectNoConflicts(rule, '4242');
+    })));
+  });
+
+  describe('DoubleMetaphoneRule', () => {
+    it('should complain when metaphone matches', async(inject([DoubleMetaphoneRule], (rule: HandleRule) => {
+      let checkit = (name, existing) => {
+        rule.check(name).then((conflicts) => {
+          expect(conflicts.length).toBeGreaterThan(0, `no conflicts for ${name}`);
+          let found = conflicts.find((x) => x.conflict.name === existing);
+          expect(found).toBeTruthy(`${existing} not found in ${JSON.stringify(conflicts)}`);
+          expect(found.candidateName).toBe(name);
+          expect(found.description).toMatch(`may sound like ${existing}`);
+        }).catch((e) => fail(e));
+      };
+      checkit('alpha', 'Alfa');
+      checkit('Elpha', 'Alfa');
+      checkit('BRAVE', 'Bravo');
+      checkit('Shirley', 'Charlie');
+      checkit('tilde', 'Delta');
+      checkit('Phockstroth', 'Foxtrot');
+      checkit('FocsDryad', 'Foxtrot');
+      checkit('K. L. F.', 'Golf');
+      checkit('Jeweled', 'Juliett');
+      checkit('Popo', 'Papa');
+      checkit('Sero', 'Sierra');
+      checkit('Victoria', 'Victor');
+    })));
+
+    it('should not complain when metaphone fails', async(inject([DoubleMetaphoneRule], (rule: HandleRule) => {
+      expectNoConflicts(rule, 'Foxrot');
+      expectNoConflicts(rule, 'Motel');
+      expectNoConflicts(rule, 'Mice');
+      expectNoConflicts(rule, 'Nike');
+      expectNoConflicts(rule, 'Nabenfir');
+      expectNoConflicts(rule, 'Quebec City');
+      expectNoConflicts(rule, 'Unicorn');
+      expectNoConflicts(rule, 'Vitcor');
+      expectNoConflicts(rule, 'Wishco');
+      expectNoConflicts(rule, '4242');
     })));
   });
 });

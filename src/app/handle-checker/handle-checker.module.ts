@@ -6,7 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { HandleCheckerComponent } from './handle-checker.component';
 import { ALL_HANDLE_RULES } from './handle-rule';
-import { MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistanceRule, AmericanSoundexRule } from './handle-rules';
+import { RULE_CLASSES, allRulesFactory } from './handle-rules';
 import { HandleService } from './handle.service';
 
 @NgModule({
@@ -21,11 +21,11 @@ import { HandleService } from './handle.service';
   ],
   providers: [
     HandleService,
-    MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistanceRule, AmericanSoundexRule,
+    ...RULE_CLASSES,
     {
       provide: ALL_HANDLE_RULES,
-      deps: [MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistanceRule, AmericanSoundexRule],
-      useFactory: (length, fcc, phonetic, substring, edit, soundex) => [length, fcc, phonetic, substring, edit, soundex]
+      deps: RULE_CLASSES,
+      useFactory: allRulesFactory,
     },
   ],
 })

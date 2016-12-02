@@ -8,6 +8,7 @@ import { HandleService } from './handle.service';
 const RULE_NAMES = {
   'american-soundex': 'American Soundex',
   'edit-distance': 'Edit distance',
+  'double-metaphone': 'Double Metaphone',
   'fcc': 'FCC words',
   'min-length': 'Minimum length',
   'phonetic-alphabet': 'NATO phonetic letters',
@@ -55,9 +56,10 @@ export class HandleCheckerComponent implements OnInit {
     this.currentName = '';
   }
 
-  conflictTip(conflict: HandleConflict) {
-    return conflict.conflict ?
-      `Conflict with ${conflict.conflict.type} handle ${conflict.conflict.name}` : '';
+  conflictTip(c: HandleConflict) {
+    return c.conflict ?
+      `Conflict with ${c.conflict.type} handle ${c.conflict.name} (${RULE_NAMES[c.ruleId]})`
+      : '';
   }
 
   conflictClasses(conflict: HandleConflict) {

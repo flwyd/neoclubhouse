@@ -5,7 +5,10 @@ import { HandleConflict } from './handle-conflict';
 import { HandleRule } from './handle-rule';
 import { HandleService } from './handle.service';
 
-// TODO npm install double-metaphone and write a DoubleMetaphoneRule
+const doubleMetaphone = require('double-metaphone');
+
+// NOTE: When adding a new rule class, add it to the list and factory at the bottom.
+
 
 /** Handle rule for handles that are too short or don't have any letters. */
 @Injectable()
@@ -265,7 +268,7 @@ export class AmericanSoundexRule implements HandleRule {
         for (let targetHandle of hashed[hash]) {
           if (name.toLowerCase() !== targetHandle.name.toLowerCase()) {
             result.push(new HandleConflict(
-              name, `${name} may sound like ${targetHandle.name}`,
+              name, `may sound like ${targetHandle.name}`,
               'medium', this.id, targetHandle));
           }
         }
@@ -325,3 +328,87 @@ export class AmericanSoundexRule implements HandleRule {
     if (letter.match(/^[R]/)) { return 6; }
   }
 }
+
+
+/** Handle rule implementing the Double Metaphone phonetic algorithm. */
+@Injectable()
+export class DoubleMetaphoneRule implements HandleRule {
+  private hashed: Promise<{ [name: string]: Handle[] }>;
+
+  constructor(handleService: HandleService) {
+    this.hashed = handleService.getHandles().then((handles) => {
+      let result: { [name: string]: Handle[] } = {};
+      for (let handle of handles) {
+        for (let hash of this.metaphones(handle.name)) {
+          if (!result[hash]) {
+            result[hash] = [];
+          }
+          result[hash].push(handle);
+        }
+      }
+      return result;
+    });
+  }
+
+  get id(): string { return 'double-metaphone'; }
+
+  check(name: string): Promise<HandleConflict[]> {
+    let metaphones = this.metaphones(name);
+    if (metaphones.length === 0) {
+      return Promise.resolve([]);
+    }
+    return this.hashed.then((hashed) => {
+      let result = [];
+      for (let hash of metaphones) {
+        if (hash in hashed) {
+          for (let targetHandle of hashed[hash]) {
+            if (name.toLowerCase() !== targetHandle.name.toLowerCase()) {
+              result.push(new HandleConflict(
+                name, `may sound like ${targetHandle.name}`,
+                'medium', this.id, targetHandle));
+            }
+          }
+        }
+      }
+      return result;
+    });
+  }
+
+  private metaphones(name: string): string[] {
+    let metaphones = doubleMetaphone(name);
+    // metaphones is a two-element array; the second element is either
+    // the "alternate" value, used for names that match certain patterns,
+    // or the primary matching again.  Unhashable values (e.g. all numeric)
+    // are empty strings.
+    if (metaphones[0].length === 0) {
+      return [];
+    }
+    if (metaphones[0] === metaphones[1]) {
+      return [metaphones[0]];
+    }
+    return metaphones;
+  }
+}
+
+
+export const RULE_CLASSES = [
+  MinLengthRule,
+  FccRule,
+  SubstringRule,
+  EditDistanceRule,
+  PhoneticAlphabetRule,
+  AmericanSoundexRule,
+  DoubleMetaphoneRule
+];
+
+export const allRulesFactory = (
+  minLength: MinLengthRule,
+  fcc: FccRule,
+  substring: SubstringRule,
+  editDistance: EditDistanceRule,
+  nato: PhoneticAlphabetRule,
+  soundex: AmericanSoundexRule,
+  metaphone: DoubleMetaphoneRule
+): HandleRule[] => {
+  return [minLength, fcc, substring, editDistance, nato, soundex, metaphone];
+};
