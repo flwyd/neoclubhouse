@@ -1,4 +1,5 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit,
+  animate, state, style, transition, trigger } from '@angular/core';
 
 import { Handle } from './handle';
 import { HandleConflict } from './handle-conflict';
@@ -19,7 +20,13 @@ const RULE_NAMES = {
 @Component({
   selector: 'app-handle-checker',
   templateUrl: './handle-checker.component.html',
-  styleUrls: ['./handle-checker.component.scss']
+  styleUrls: ['./handle-checker.component.scss'],
+  animations: [
+    trigger('tableInsert', [
+      state('in', style({opacity: 1})),
+      transition(':enter', [style({opacity: 0}), animate(200)]),
+    ])
+  ],
 })
 export class HandleCheckerComponent implements OnInit {
   handles: Handle[] = [];

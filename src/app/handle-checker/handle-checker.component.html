@@ -25,6 +25,7 @@
         <ul *ngIf="checked.conflicts.length > 0" class="handle-conflict-list">
           <li *ngFor="let conflict of checked.conflicts"
               [ngClass]="conflictClasses(conflict)"
+              [@tableInsert]="'in'"
               [title]="conflictTip(conflict)">
             {{conflict.description}}
           </li>
@@ -33,7 +34,7 @@
   </tbody>
 </table>
 
-<h3>All Handles</h3>
+<h3>All {{handles.length}} Handles</h3>
 <table class="handle-list all-handles">
   <thead>
     <tr>
@@ -42,7 +43,9 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let handle of handles" class="handle-row">
+    <tr *ngFor="let handle of handles"
+      [@tableInsert]="'in'"
+      class="handle-row">
       <td class="handle-name"
           (click)="currentName = handle.name; handleCheckInput.scrollIntoView()">
         {{handle.name}}
