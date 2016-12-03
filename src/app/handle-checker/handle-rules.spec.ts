@@ -3,7 +3,7 @@ import { TestBed, async, inject } from '@angular/core/testing';
 import { HandleCheckerModule } from './handle-checker.module';
 import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
 import { MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistanceRule,
-  AmericanSoundexRule, DoubleMetaphoneRule } from './handle-rules';
+  AmericanSoundexRule, DoubleMetaphoneRule, EyeRhymeRule } from './handle-rules';
 import { HandleService } from './handle.service';
 import { MockHandleService } from './handle.service.mock';
 
@@ -29,7 +29,7 @@ describe('Handle rules', () => {
   describe('ALL_HANDLE_RULES', () => {
     it('should inject all rules', inject([ALL_HANDLE_RULES], (rules: HandleRule[]) => {
       expect(rules).toBeTruthy();
-      expect(rules.length).toBe(7);
+      expect(rules.length).toBe(8);
       let ids = rules.map((x) => x.id).sort();
       expect(ids).toEqual([
         'american-soundex',
@@ -38,6 +38,7 @@ describe('Handle rules', () => {
         'fcc',
         'min-length',
         'phonetic-alphabet',
+        'rhyming-syllables',
         'substring',
       ]);
     }));
@@ -199,6 +200,7 @@ describe('Handle rules', () => {
           expect(found.description).toMatch(`${name} contains ${existing}`);
         }).catch((e) => fail(e));
       };
+      checkit('ALFALFA', 'Alfa');
       checkit('TheGolfather', 'Golf');
       checkit('paparazi', 'Papa');
       checkit('Gary Indiana', 'India');
@@ -313,6 +315,73 @@ describe('Handle rules', () => {
       expectNoConflicts(rule, 'Unicorn');
       expectNoConflicts(rule, 'Vitcor');
       expectNoConflicts(rule, 'Wishco');
+      expectNoConflicts(rule, '4242');
+    })));
+  });
+
+  describe('EyeRhymeRule', () => {
+    it('should complain when metaphone matches', async(inject([EyeRhymeRule], (rule: HandleRule) => {
+      let checkit = (name, existing, multiple = false) => {
+        rule.check(name).then((conflicts) => {
+          expect(conflicts.length).toBeGreaterThan(0, `no conflicts for ${name}`);
+          let found = conflicts.find((x) => x.conflict.name === existing);
+          expect(found).toBeTruthy(`${existing} not found in ${JSON.stringify(conflicts)}`);
+          expect(found.candidateName).toBe(name);
+          expect(found.description).toMatch(
+            multiple ? `rhyming syllables with ${existing}`
+              : `a syllable rhyming with ${existing}`);
+        }).catch((e) => fail(e));
+      };
+      // Several of these test cases are opportunities to improve the album.
+      // If code changes and breaks these tests, it may be a positive sign
+      // A lot of the phonetic letters have syllables without a coda, so this
+      // algorithm is particularly awkward.
+      checkit('Alfalfa', 'Alfa', true);
+      checkit('Da Mal', 'Alfa'); // not a great match
+      checkit('A', 'Bravo'); // not a great match
+      checkit('You lie', 'Charlie');
+      checkit('Nice Car!', 'Charlie');
+      checkit('gwar', 'Charlie'); // not a great match
+      checkit('Ta Bel', 'Delta', true); // not a great match
+      checkit('Malta', 'Delta'); // non-multiple
+      checkit('Go be', 'Echo'); // not a great match
+      checkit('Unboxt', 'Foxtrot'); // foxt/rot rather than fox/trot
+      checkit('Adolf', 'Golf');
+      checkit('olfactory', 'Golf');
+      checkit('Elgo', 'Hotel'); // not a great match
+      checkit('Shia mind', 'India', true);
+      checkit('Zulu', 'Juliett', true); // so-so match
+      checkit('Loki', 'Kilo', true);
+      checkit('O-I', 'Kilo', true); // not a great match
+      checkit('I, A Word', 'Lima', true); // not a great match
+      checkit('Hike', 'Mike');
+      checkit('Remember', 'November', true);
+      checkit('Alemonger', 'November'); // not a good match
+      checkit('A', 'Papa', true); // not a great match
+      checkit('accrue', 'Quebec'); // not a great match
+      checkit('OK', 'Romeo');
+      checkit('Amplifier', 'Sierra'); // not a great match
+      checkit('The Man', 'Tango'); // not a great match
+      checkit('Maelstorm', 'Uniform');
+      checkit('unique', 'Uniform', true); // not a great match
+      checkit('Hiccup', 'Victor'); // not a great match
+      checkit('Misdeed', 'Whiskey');
+      checkit('They Is', 'Whiskey', true); // not a good match
+      checkit('Nice Day', 'X-ray');
+      checkit('Mr. X', 'X-ray');
+      checkit('An old bee', 'Yankee');
+      checkit('I <3 U', 'Zulu', true); // not a good match
+    })));
+
+    it('should not complain when metaphone fails', async(inject([EyeRhymeRule], (rule: HandleRule) => {
+      expectNoConflicts(rule, 'Adolph'); // should rhyme with Golf
+      expectNoConflicts(rule, 'oubliette'); // should rhyme with Juliett
+      expectNoConflicts(rule, 'Keee-Low'); // should rhyme with Kilo
+      expectNoConflicts(rule, 'forme'); // should rhyme with Uniform
+      expectNoConflicts(rule, 'Mice'); // silent e
+      expectNoConflicts(rule, 'Vine');
+      expectNoConflicts(rule, 'bang');
+      expectNoConflicts(rule, 'T-Rex');
       expectNoConflicts(rule, '4242');
     })));
   });

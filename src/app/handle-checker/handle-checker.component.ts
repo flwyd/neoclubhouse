@@ -7,8 +7,9 @@ import { HandleService } from './handle.service';
 
 const RULE_NAMES = {
   'american-soundex': 'American Soundex',
-  'edit-distance': 'Edit distance',
   'double-metaphone': 'Double Metaphone',
+  'edit-distance': 'Edit distance',
+  'eye-rhyme': 'Eye rhymes',
   'fcc': 'FCC words',
   'min-length': 'Minimum length',
   'phonetic-alphabet': 'NATO phonetic letters',

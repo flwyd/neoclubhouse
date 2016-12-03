@@ -391,6 +391,175 @@ export class DoubleMetaphoneRule implements HandleRule {
 }
 
 
+/**
+  * A syllable consists of an onset and a rime.  A rime consists of a nucleus
+  * and a coda.  Onset and coda are consonant clusters, nucleus is a vowel or
+  * a dipthong.  "breath" = {onset: br, rime: {nucleus: ea, coda: th}}
+  * For long vowels in English orthography, the silentEnding may be 'e'.
+  */
+class Syllable {
+  constructor(
+    public onset: string, // optional consonant cluster before the vowel
+    public nucleus: string, // vowel or dipthong
+    public coda: string, // optional consonant cluster after the vowel
+    public silentEnding = '' // optional silent e
+  ) { }
+
+  get rime() { return this.nucleus + this.coda + this.silentEnding; }
+}
+
+// TODO is this really needed?
+class RhymeEntity {
+  constructor(
+    public handle: Handle,
+    public syllables: Syllable[]
+  ) { }
+}
+
+/**
+* Handle rule identifying names which contain syllables that rhyme.
+* These are "eye rhymes" because they're based on spelling rather than true pronunciation.
+*/
+@Injectable()
+export class EyeRhymeRule implements HandleRule {
+  // TODO In poetry, a rhyme is the last stressed vowel to the end of the word.
+  // Consider identifying stress so that "avo" (not "o") matches "bravo".
+  private rimeIndex: Promise<{ [rime: string]: RhymeEntity[] }>;
+
+  constructor(handleService: HandleService) {
+    this.rimeIndex = handleService.getHandles().then((handles) => {
+      let result: { [rime: string]: RhymeEntity[] } = {};
+      for (let handle of handles) {
+        let entity = new RhymeEntity(handle, this.toSyllables(handle.name));
+        let rimes = entity.syllables.map((s) => s.rime)
+          .filter((r) => r.length > 0);
+        for (let rime of rimes) {
+          if (!result[rime]) {
+            result[rime] = [];
+          }
+          result[rime].push(entity);
+        }
+      }
+      return result;
+    });
+  }
+
+  get id(): string { return 'eye-rhyme'; }
+
+  check(name: string): Promise<HandleConflict[]> {
+    let syllables = this.toSyllables(name);
+    if (syllables.length === 0) {
+      return Promise.resolve([]);
+    }
+    return this.rimeIndex.then((index) => {
+      let rhymes: Map<Handle, number> = new Map();
+      for (let syllable of syllables.filter((s) => s.rime in index)) {
+        for (let handle of index[syllable.rime].map((e) => e.handle)) {
+          if (rhymes.has(handle)) {
+            rhymes.set(handle, rhymes.get(handle) + 1);
+          } else {
+            rhymes.set(handle, 1);
+          }
+        }
+      }
+      let result = [];
+      rhymes.forEach((count, handle) => {
+        // TODO don't complain if count is 1 and the names have several syllables
+        // or perhaps consider syllable positione, e.g. end vs. start of the name
+        let description = (count === 1)
+          ? `has a syllable rhyming with ${handle.name}`
+          : `shares ${count} rhyming syllables with ${handle.name}`;
+        // TODO base priority on count vs. number of syllables
+        result.push(new HandleConflict(name, description, 'medium', this.id, handle));
+      });
+      return result;
+    });
+  }
+
+  toSyllables(text: string): Syllable[] {
+    text = text.trim();
+    if (text.length === 0) {
+      return [];
+    }
+    let syllables = [];
+    // Split words on non-alphanumeric, CamelCase, and numbers
+    // Probably does the wrong thing with non-ascii letters
+    let words = text.split(/[\W_]+/)
+      .filter((word) => word.length > 0)
+      // Capturing group keeps match contents as delimiters
+      .map((word) => word.split(/([A-Z][a-z]*|\d+)/).filter((s) => s.length > 0))
+      .reduce((a, b) => a.concat(b), []);
+    words.forEach((word) => {
+      word = word.toLowerCase();
+      if (!word.match(/[a-z]/)) { // all numeric or something
+        return;
+      }
+      // Work backwards, consume silent e, then coda, then nucleus, then onset.
+      // If onset is preceeded by more than one cluster, pick the optimal
+      // coda/onset breaking point.
+      let clusters: string[] = word.split(/([aeiouy]+|[^aeiouy]+)/)
+        .filter((s) => s.length > 0);
+      while (clusters.length > 0) {
+        // TODO to preserve order, make the loop return an array and use shift
+        let onset = '';
+        let nucleus = '';
+        let coda = '';
+        if (clusters.length === 1) {
+          // Single cluster of either vowels or consonants
+          let rime = clusters.pop();
+          [nucleus, coda] = this.vowelsOnly(rime) ? [rime, ''] : ['', rime];
+          syllables.push(new Syllable(onset, nucleus, coda));
+          continue;
+        }
+        // English orthography: assume an e after a consonant is silent if there's a preceding vowel
+        let silentEnding = '';
+        if (clusters.length > 2 && clusters[clusters.length - 1] === 'e') {
+          silentEnding = clusters.pop();
+        }
+        if (this.vowelsOnly(clusters[clusters.length - 1])) {
+          nucleus = clusters.pop();
+        } else {
+          coda = clusters.pop();
+          nucleus = clusters.pop();
+          if (!this.vowelsOnly(nucleus)) {
+            throw `Unexpected consonant nucleus in ${word}`;
+          }
+        }
+        if (clusters.length === 1) {
+          onset = clusters.pop();
+          if (this.vowelsOnly(onset)) {
+            throw `Unexpected vowel onset in ${word}`;
+          }
+        } else if (clusters.length > 2) {
+          let split = this.splitConsonants(clusters.pop());
+          onset = split[1];
+          if (split[0].length > 0) {
+            clusters.push(split[0]); // coda for next round
+          }
+        }
+        syllables.push(new Syllable(onset, nucleus, coda, silentEnding));
+      }
+    }); // each word
+    return syllables;
+  }
+
+  private splitConsonants(s: string): string[] {
+    if (s.length === 0 || this.vowelsOnly(s)) {
+      throw `Expected consonants, got ${s}`;
+    }
+    if (s.length === 1) {
+      // TODO take surrounding clusters into account
+      return ['', s];
+    }
+    // TODO determine likelihood based on consonant cooccurrence frequencies
+    let splitPoint = Math.round(s.length / 2);
+    return [s.substring(0, splitPoint), s.substring(splitPoint)];
+  }
+
+  private vowelsOnly(s: string): boolean { return !!s.match(/^[aeiouy]+$/); }
+}
+
+
 export const RULE_CLASSES = [
   MinLengthRule,
   FccRule,
@@ -398,7 +567,8 @@ export const RULE_CLASSES = [
   EditDistanceRule,
   PhoneticAlphabetRule,
   AmericanSoundexRule,
-  DoubleMetaphoneRule
+  DoubleMetaphoneRule,
+  EyeRhymeRule,
 ];
 
 export const allRulesFactory = (
@@ -408,7 +578,8 @@ export const allRulesFactory = (
   editDistance: EditDistanceRule,
   nato: PhoneticAlphabetRule,
   soundex: AmericanSoundexRule,
-  metaphone: DoubleMetaphoneRule
+  metaphone: DoubleMetaphoneRule,
+  rhymes: EyeRhymeRule,
 ): HandleRule[] => {
-  return [minLength, fcc, substring, editDistance, nato, soundex, metaphone];
+  return [minLength, fcc, substring, editDistance, nato, soundex, metaphone, rhymes];
 };
