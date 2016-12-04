@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^2.2.1",
     "@angular/platform-browser-dynamic": "^2.2.1",
     "@angular/router": "^3.1.0",
+    "angular2-notifications": "^0.4.47",
     "core-js": "^2.4.1",
     "double-metaphone": "^1.0.0",
     "rxjs": "5.0.0-beta.12",

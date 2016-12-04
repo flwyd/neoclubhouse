@@ -2,12 +2,14 @@
 
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        SimpleNotificationsModule,
         RouterTestingModule.withRoutes([
           { path: '', component: AppComponent }
         ]),

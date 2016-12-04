@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { NotificationsService } from 'angular2-notifications';
 
 import { PHONETIC_ALPHABET } from './static-handles';
 import { Handle } from './handle';
@@ -13,14 +14,24 @@ export class HandleService {
   // TODO switch to observable
   private allHandles: Promise<Handle[]>;
 
-  constructor(private http: Http) { }
+  constructor(
+    private http: Http,
+    private notifications: NotificationsService
+  ) { }
 
   getHandles(): Promise<Handle[]> {
     if (!this.allHandles) {
       this.allHandles = Promise.all([
         this.fetchHandles(),
         Promise.resolve(PHONETIC_ALPHABET)
-      ]).then((results) => Array.prototype.concat.apply([], results).sort(Handle.comparator));
+      ]).then((results: Handle[][]) => {
+        let handles: Handle[] = [].concat(...results).sort(Handle.comparator);
+        if (!handles.some((h) => h.type.match(/ranger/i) !== null)) {
+          this.notifications.alert('No Rangers loaded',
+            `No Ranger handles were found.  Make sure you're logged in to the Secret Clubhouse.`);
+        }
+        return handles;
+      });
     }
     return this.allHandles;
   };
@@ -29,8 +40,14 @@ export class HandleService {
     return this.http.get(this.handlesUrl)
       .toPromise()
       .then((response) => response.json() as Handle[])
-      .catch((e) => {
-        console.warn(`Error loading handles from ${this.handlesUrl}: ${e}`);
+      .catch((err) => {
+        if (err) {
+          console.error(`Error loading handles from ${this.handlesUrl}: ${err}`);
+          this.notifications.error('Error loading handles', `${err.name}: ${err.message}`);
+        } else {
+          console.error('Unknown error loading handles');
+          this.notifications.error('Error loading handles', 'Unfortunately, we don\'t know why');
+        }
         return [];
       });
   }
