@@ -1,8 +1,6 @@
-// TODO extract a base environment and extend, per
-// https://github.com/angular/angular-cli/issues/933
-export const environment = {
+import { Environment } from '../environment.base';
+
+/** Environment overrides for `ng build --prod`. */
+export const environment = new Environment({
   production: true,
-  secretClubhouse: {
-    dmsUri: '/index.php',
-  },
-};
+});
