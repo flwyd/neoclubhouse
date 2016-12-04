@@ -4,13 +4,16 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { PHONETIC_ALPHABET } from './static-handles';
 import { Handle } from './handle';
+import { dmsUri } from '../secret-clubhouse';
 
 import 'rxjs/add/operator/toPromise';
 
+/**
+ * Service for loading Ranger callsigns and other reserved handles and radio jargon.
+ */
 @Injectable()
 export class HandleService {
-  // TODO Map /api/ in secretclubhouse.  The /rangeroffice only works for Stonebeard's proxy setup.
-  private readonly handlesUrl = '/rangeroffice/?DMSc=security&DMSm=listReservedEntities';
+  private readonly handlesUrl = dmsUri('security', 'listReservedEntities');
   // TODO switch to observable
   private allHandles: Promise<Handle[]>;
 
