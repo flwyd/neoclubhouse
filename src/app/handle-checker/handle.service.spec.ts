@@ -6,6 +6,11 @@ import { BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/ht
 import { MockBackend } from '@angular/http/testing';
 import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
 
+/**
+ * Jasmine unit tests for {@link HandleService}.  Provides a mock HTTP backend.
+ * Tests for code which consumes the HandleService should generally provide a MockHandleService
+ * rather than a mock HTTP backend for the real one.
+ */
 describe('HandleService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({

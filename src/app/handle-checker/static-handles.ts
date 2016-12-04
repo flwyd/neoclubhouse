@@ -1,5 +1,10 @@
+/** This file contains handles which are always present.  Useful in unit tests. */
 import { Handle } from './handle';
 
+/**
+ * Words used to spell things over noisy channels.
+ * @see https://en.wikipedia.org/wiki/NATO_phonetic_alphabet
+ */
 export const PHONETIC_ALPHABET: Handle[] = [
   { name: 'Alfa', type: 'phonetic-alphabet' },
   { name: 'Bravo', type: 'phonetic-alphabet' },

@@ -1,9 +1,13 @@
+/**
+ * Represents a callsign, reserved word, or other jargon that is likely to be broadcast on Ranger
+ * radio channels.
+ */
 export class Handle {
   name: string;
   type: string;
-  // TODO make type an enum
+  // TODO make type an enum or string disjunction?
   // TODO subtype, e.g. active/vintage/inactive
-  // TODO priority
+  // TODO add a priority field?
 
   static comparator(a: Handle, b: Handle) {
     // TODO use comparators npm module

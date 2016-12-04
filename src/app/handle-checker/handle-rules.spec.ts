@@ -7,6 +7,7 @@ import { MinLengthRule, FccRule, PhoneticAlphabetRule, SubstringRule, EditDistan
 import { HandleService } from './handle.service';
 import { MockHandleService } from './handle.service.mock';
 
+/** Jasmine unit tests for all {@link HandleRule}s. */
 describe('Handle rules', () => {
   const descriptionsFrom = (conflicts) => conflicts.map((c) => c.description);
   const expectNoConflicts = (rule, name) => {

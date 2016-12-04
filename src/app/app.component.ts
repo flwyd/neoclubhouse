@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 
+/**
+ * Component defining the UI shell for the whole app.  This class shouldn't accumulate a lot of
+ * logic; most work will be done by components which are included from app.component.html.
+ */
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

@@ -9,6 +9,12 @@ import { ALL_HANDLE_RULES } from './handle-rule';
 import { RULE_CLASSES, allRulesFactory } from './handle-rules';
 import { HandleService } from './handle.service';
 
+/**
+ * Module configuring dependencies for the handle checker system.
+ * To check a handle against all rules, use
+ * @example
+ * \@Inject(ALL_HANDLE_RULES) rules: HandleRule[]
+ */
 @NgModule({
   imports: [
     CommonModule,
