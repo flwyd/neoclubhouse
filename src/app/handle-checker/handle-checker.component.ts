@@ -6,6 +6,7 @@ import { HandleConflict } from './handle-conflict';
 import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
 import { HandleService } from './handle.service';
 
+/** Mapping from {@link HandleRule#id} to display string. */
 const RULE_NAMES = {
   'american-soundex': 'American Soundex',
   'double-metaphone': 'Double Metaphone',
@@ -17,6 +18,13 @@ const RULE_NAMES = {
   'substring': 'Substring match',
 };
 
+/**
+ * View for the Ranger handle checker.  Loads a list of {@link HandleRule}s and presents a form for
+ * entering prospective handles.  Each rule applies its own logic and returns a list of potential
+ * conflicts, which this component displays.  Rules can be disabled via checkboxes.
+ * This component also shows a list of all known handles and other reserved words to facilitate
+ * handle browsing and textual searches.
+ */
 @Component({
   selector: 'app-handle-checker',
   templateUrl: './handle-checker.component.html',
@@ -29,9 +37,13 @@ const RULE_NAMES = {
   ],
 })
 export class HandleCheckerComponent implements OnInit {
+  /** All known handles and reserved words. */
   handles: Handle[] = [];
+  /** Prospective handles which have been checked in this session. */
   checkedNames: {name: string, conflicts: HandleConflict[]}[] = [];
+  /** The name being entered or checked (bound to an input field). */
   @Input() currentName = '';
+  /** Enabled/disabled state for each rule.  If !active, the rule won't be asked for conflicts. */
   @Input() ruleState: { rule: HandleRule, name: string, active: boolean }[] = [];
 
   constructor(
@@ -47,30 +59,36 @@ export class HandleCheckerComponent implements OnInit {
     }).sort((a, b) => a.name < b.name ? -1 : 1);
   }
 
-  checkCurrentName() {
+  /**
+   * Check {@link currentName} against each active rule, appending results to {@link checkedNames}.
+   */
+  checkCurrentName(): void {
     let name = this.currentName.trim();
     if (name === '') {
       return;
     }
-    let conflicts = [];
+    let promises = [];
     for (let state of this.ruleState) {
       if (state.active) {
-        state.rule.check(name).then((results) => {
-          Array.prototype.push.apply(conflicts, results);
-        });
+        promises.push(state.rule.check(name));
       }
     }
-    this.checkedNames.unshift({name: name, conflicts: conflicts});
+    Promise.all(promises).then((conflicts: HandleConflict[][]) => {
+      let all = conflicts.reduce((acc, l) => acc.concat(l), []);
+      this.checkedNames.unshift({name: name, conflicts: all});
+    });
     this.currentName = '';
   }
 
-  conflictTip(c: HandleConflict) {
+  /** Tool tip for a {@link HandleConflict}. */
+  conflictTip(c: HandleConflict): string {
     return c.conflict ?
       `Conflict with ${c.conflict.type} handle ${c.conflict.name} (${RULE_NAMES[c.ruleId]})`
       : '';
   }
 
-  conflictClasses(conflict: HandleConflict) {
+  /** List of CSS classes to apply to a {@link HandleConflict}. */
+  conflictClasses(conflict: HandleConflict): string[] {
     let classes = [
       `handle-conflict-priority-${conflict.priority}`,
       `handle-conflict-rule-${conflict.ruleId}`,
