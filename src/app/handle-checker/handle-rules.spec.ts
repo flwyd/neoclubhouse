@@ -35,10 +35,10 @@ describe('Handle rules', () => {
         'american-soundex',
         'double-metaphone',
         'edit-distance',
+        'eye-rhyme',
         'fcc',
         'min-length',
         'phonetic-alphabet',
-        'rhyming-syllables',
         'substring',
       ]);
     }));
