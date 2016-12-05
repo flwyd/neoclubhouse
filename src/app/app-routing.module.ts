@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { ClubhouseEmbedComponent } from './clubhouse-embed/clubhouse-embed.component';
 import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
 
 /**
@@ -12,6 +13,7 @@ import { HandleCheckerComponent } from './handle-checker/handle-checker.componen
 const routes: Routes = [
   { path: '', children: [] },
   { path: 'handle-checker', component: HandleCheckerComponent },
+  { path: 'clubhouse', component: ClubhouseEmbedComponent },
 ];
 
 @NgModule({

@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { HandleCheckerModule } from './handle-checker/handle-checker.module';
+import { ClubhouseEmbedModule } from './clubhouse-embed/clubhouse-embed.module';
 
 /**
  * Module configuring the Neoclubhouse app.  This class configures dependency injection globally.
@@ -21,6 +22,7 @@ import { HandleCheckerModule } from './handle-checker/handle-checker.module';
   ],
   imports: [
     BrowserModule,
+    ClubhouseEmbedModule,
     HttpModule,
     HandleCheckerModule,
     SimpleNotificationsModule,
