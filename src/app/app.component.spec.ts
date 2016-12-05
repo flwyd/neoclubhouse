@@ -4,6 +4,8 @@ import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { AppComponent } from './app.component';
+import { SecretClubhouseService } from './secret-clubhouse.service';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 describe('AppComponent', () => {
   beforeEach(() => {
@@ -16,6 +18,15 @@ describe('AppComponent', () => {
       ],
       declarations: [
         AppComponent
+      ],
+      providers: [
+        {
+          provide: SecretClubhouseService,
+          // TODO something more elegant
+          useFactory: () => {
+            return {getAuthState: () => new BehaviorSubject({ loggedIn: false })};
+          },
+        },
       ],
     });
   });

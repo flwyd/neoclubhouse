@@ -33,6 +33,9 @@ export class Environment {
      * (Remove the \ from \/, it's needed to prevent the comment from closing.)
      */
     dmsUri: '/index.php',
+
+    /** Number of milliseconds betwen checks if the user is logged in. */
+    authCheckFrequencyMs: 5 * 60 * 1000,
   };
 
   constructor(overrides = {}) {
