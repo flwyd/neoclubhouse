@@ -2,7 +2,9 @@
 <form (submit)="checkCurrentName()">
   <input #handleCheckInput [(ngModel)]="currentName"
       name="name" type="text" id="handle-check-input" placeholder="Try a handle">
-  <button type="submit">Check handle</button>
+  <button id="check-handle-button" type="submit">Check handle</button>
+  <button id="clear-checked-handles-button" type="button"
+      (click)="clearCheckedNames(); handleCheckInput.focus()">Clear checked handles</button>
   <br />
   Rules:
   <label *ngFor="let state of ruleState" class="rule-select">
@@ -47,7 +49,7 @@
       [@tableInsert]="'in'"
       class="handle-row">
       <td class="handle-name"
-          (click)="currentName = handle.name; handleCheckInput.scrollIntoView()">
+          (click)="currentName = handle.name; handleCheckInput.focus()">
         {{handle.name}}
       </td>
       <td class="handle-type">{{handle.type}}</td>

@@ -80,6 +80,10 @@ export class HandleCheckerComponent implements OnInit {
     this.currentName = '';
   }
 
+  clearCheckedNames(): void {
+    this.checkedNames.splice(0);
+  }
+
   /** Tool tip for a {@link HandleConflict}. */
   conflictTip(c: HandleConflict): string {
     return c.conflict ?

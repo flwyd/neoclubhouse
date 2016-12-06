@@ -80,7 +80,7 @@ describe('HandleCheckerComponent', () => {
     expect(input).toBeTruthy();
     let inputEl = input.nativeElement;
     expect(inputEl.textContent).toBe('');
-    let button = findElement(fixture, 'button[type="submit"]');
+    let button = findElement(fixture, '#check-handle-button');
     expect(button).toBeTruthy();
     let table = findElement(fixture, '.checked-handles');
     expect(table).toBeTruthy();
@@ -101,6 +101,30 @@ describe('HandleCheckerComponent', () => {
         let substringConflict = findElement(row, '.handle-conflict-rule-substring');
         expect(substringConflict.nativeElement.textContent).toMatch('November');
         expect(inputEl.textContent).toBe(''); // submit clears input
+      });
+    });
+  }));
+
+  it('should clear checked handles', async(() => {
+    fixture.detectChanges();
+    let clearButton = findElement(fixture, '#clear-checked-handles-button');
+    let table = findElement(fixture, '.checked-handles');
+    expect(table).toBeTruthy();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      component.currentName = 'foxy';
+      component.checkCurrentName();
+      component.currentName = 'unicorn';
+      component.checkCurrentName();
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
+        let rows = findElements(table, '.handle-row');
+        expect(rows.length).toBe(2);
+        clearButton.nativeElement.click();
+        fixture.whenStable().then(() => {
+          fixture.detectChanges();
+          expect(findElements(table, '.handle-row').length).toBe(0);
+        });
       });
     });
   }));
