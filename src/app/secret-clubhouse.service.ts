@@ -18,7 +18,7 @@ export class SecretClubhouseService {
   private authState = new BehaviorSubject(new AuthState());
 
   private readonly authCheckUri = dmsUri('security', 'authJson');
-  private readonly authCheckInterval = environment.secretClubhouse.authCheckFrequencyMs;
+  private polling = false;
 
   // TODO Get notified somehow when logout happens in the embed iframe
 
@@ -27,7 +27,6 @@ export class SecretClubhouseService {
     private notifications: NotificationsService
   ) {
     setTimeout(() => this.checkAuth(), 0);
-    setInterval(() => this.checkAuth(), this.authCheckInterval);
   }
 
   getAuthState(): Observable<AuthState> { return this.authState; }
@@ -42,8 +41,21 @@ export class SecretClubhouseService {
       }).catch((err) => {
         console.error(`Error checking auth state from ${this.authCheckUri}: ${err}`);
         this.notifications.error('Error checking login state', `${err.name}: ${err.message}`,
-          { id: 'login-check-error', timeOut: this.authCheckInterval / 5 });
+          { id: 'login-check-error', timeOut: Math.max(10000, this.authCheckInterval / 5) });
         return false;
       });
   }
+
+  /**
+   * Periodically polls for auth state.  This method is idempotent: multiple calls won't set up
+   * multiple polling intervals.
+   */
+  checkAuthPeriodically(): void {
+    if (!this.polling && this.authCheckInterval > 0) {
+      this.polling = true;
+      setInterval(() => this.checkAuth(), this.authCheckInterval);
+    }
+  }
+
+  private get authCheckInterval() { return environment.secretClubhouse.authCheckFrequencyMs; }
 }

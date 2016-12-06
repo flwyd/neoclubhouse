@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AuthState, SecretClubhouseService } from './secret-clubhouse.service';
 
@@ -11,7 +11,7 @@ import { AuthState, SecretClubhouseService } from './secret-clubhouse.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Ranger Neoclubhouse';
   authState = new AuthState();
 
@@ -21,10 +21,14 @@ export class AppComponent {
   };
 
   constructor(
-    clubhouse: SecretClubhouseService
-  ) {
-    clubhouse.getAuthState().subscribe({
+    private clubhouse: SecretClubhouseService
+  ) { }
+
+  /** Put application-level initialization code here. */
+  ngOnInit() {
+    this.clubhouse.getAuthState().subscribe({
       next: (state) => this.authState = state
     });
+    this.clubhouse.checkAuthPeriodically();
   }
 }

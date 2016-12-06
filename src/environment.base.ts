@@ -34,7 +34,10 @@ export class Environment {
      */
     dmsUri: '/index.php',
 
-    /** Number of milliseconds betwen checks if the user is logged in. */
+    /**
+    * Number of milliseconds betwen checks of authentication state.
+    * If this is less than or equal to zero, login state won't be polled.
+    */
     authCheckFrequencyMs: 5 * 60 * 1000,
   };
 
