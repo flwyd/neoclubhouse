@@ -4,7 +4,7 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { PHONETIC_ALPHABET } from './static-handles';
 import { Handle } from './handle';
-import { dmsUri } from '../secret-clubhouse';
+import { apiUri } from '../secret-clubhouse';
 
 import 'rxjs/add/operator/toPromise';
 
@@ -13,7 +13,7 @@ import 'rxjs/add/operator/toPromise';
  */
 @Injectable()
 export class HandleService {
-  private readonly handlesUrl = dmsUri('security', 'listReservedEntities');
+  private readonly handlesUrl = apiUri('handles');
   // TODO switch to observable
   private allHandles: Promise<Handle[]>;
 
@@ -42,11 +42,17 @@ export class HandleService {
   private fetchHandles(): Promise<Handle[]> {
     return this.http.get(this.handlesUrl)
       .toPromise()
-      .then((response) => response.json() as Handle[])
+      .then((response) => response.json().data as Handle[])
       .catch((err) => {
         if (err) {
           console.error(`Error loading handles from ${this.handlesUrl}: ${err}`);
-          this.notifications.error('Error loading handles', `${err.name}: ${err.message}`);
+          if (err instanceof Error) {
+            this.notifications.error('Error loading handles', `${err.name}: ${err.message}`);
+          } else if (err.json) {
+            this.notifications.error('Error loading handles', err.json().error.message);
+          } else {
+            this.notifications.error('Error loading handles', err);
+          }
         } else {
           console.error('Unknown error loading handles');
           this.notifications.error('Error loading handles', 'Unfortunately, we don\'t know why');

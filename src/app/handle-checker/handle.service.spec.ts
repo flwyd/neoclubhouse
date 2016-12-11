@@ -36,12 +36,12 @@ describe('HandleService', () => {
 
   it('should return some handles', async(inject([HandleService, MockBackend], (service: HandleService, backend: MockBackend) => {
     backend.connections.subscribe((c) => {
-      if (c.request.url.match(/DMSc=security&DMSm=listReservedEntities/)) {
+      if (c.request.url.match(/api\/v0\/handles/)) {
         let response = new Response(new ResponseOptions({
-          body: JSON.stringify([
+          body: JSON.stringify({data: [
             { name: 'Danger', type: 'vintage ranger' },
             { name: 'Zebra', type: 'reserved' },
-          ])
+          ]})
         }));
         c.mockRespond(response);
       }
@@ -85,12 +85,12 @@ describe('HandleService', () => {
         next: (notevt) => notifications.push(notevt)
       });
       backend.connections.subscribe((c) => {
-        if (c.request.url.match(/DMSc=security&DMSm=listReservedEntities/)) {
+        if (c.request.url.match(/api\/v0\/handles/)) {
           let response = new Response(new ResponseOptions({
-            body: JSON.stringify([
+            body: JSON.stringify({data: [
               { name: 'Berlin', type: 'reserved' },
               { name: 'Tokyo', type: 'reserved' },
-            ])
+            ]})
           }));
           c.mockRespond(response);
         }
@@ -110,13 +110,13 @@ describe('HandleService', () => {
         next: (notevt) => notifications.push(notevt)
       });
       backend.connections.subscribe((c) => {
-        if (c.request.url.match(/DMSc=security&DMSm=listReservedEntities/)) {
+        if (c.request.url.match(/api\/v0\/handles/)) {
           let response = new Response(new ResponseOptions({
-            body: JSON.stringify([
+            body: JSON.stringify({data: [
               { name: 'Berlin', type: 'reserved' },
               { name: 'Tokyo', type: 'reserved' },
               { name: 'Dusty', type: 'vintage ranger' },
-            ])
+            ]})
           }));
           c.mockRespond(response);
         }
