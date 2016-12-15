@@ -23,9 +23,9 @@
     "angular2-notifications": "^0.4.47",
     "core-js": "^2.4.1",
     "double-metaphone": "^1.0.0",
-    "rxjs": "5.0.0-beta.12",
+    "rxjs": "^5.0.1",
     "ts-helpers": "^1.1.1",
-    "zone.js": "^0.6.23"
+    "zone.js": "^0.7.2"
   },
   "devDependencies": {
     "@angular/compiler-cli": "^2.2.1",
