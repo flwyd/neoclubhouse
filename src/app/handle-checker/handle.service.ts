@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { NotificationsService } from 'angular2-notifications';
 
 import { PHONETIC_ALPHABET } from './static-handles';
 import { Handle } from './handle';
-import { apiUri } from '../secret-clubhouse';
+import { ApiRequest, SecretClubhouseService } from '../secret-clubhouse.service';
 
 import 'rxjs/add/operator/toPromise';
 
@@ -13,12 +12,11 @@ import 'rxjs/add/operator/toPromise';
  */
 @Injectable()
 export class HandleService {
-  private readonly handlesUrl = apiUri('handles');
   // TODO switch to observable
   private allHandles: Promise<Handle[]>;
 
   constructor(
-    private http: Http,
+    private clubhouse: SecretClubhouseService,
     private notifications: NotificationsService
   ) { }
 
@@ -40,12 +38,12 @@ export class HandleService {
   };
 
   private fetchHandles(): Promise<Handle[]> {
-    return this.http.get(this.handlesUrl)
+    return this.clubhouse.request(ApiRequest.get('handles'))
       .toPromise()
       .then((response) => response.json().data as Handle[])
       .catch((err) => {
         if (err) {
-          console.error(`Error loading handles from ${this.handlesUrl}: ${err}`);
+          console.error(`Error loading handles: ${err}`);
           if (err instanceof Error) {
             this.notifications.error('Error loading handles', `${err.name}: ${err.message}`);
           } else if (err.json) {

@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async, inject } from '@angular/core/testing';
-import { BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
+import { BaseRequestOptions, Headers, Http, Response, ResponseOptions } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
 import { AuthState, SecretClubhouseService } from './secret-clubhouse.service';
 import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
@@ -9,8 +9,13 @@ import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifi
 function mockResponse(backend: MockBackend, result: any): void {
   backend.connections.subscribe((c) => {
     if (c.request.url.match(/DMSc=security&DMSm=authJson/)) {
+      let headers = new Headers();
+      if (result.data && result.data.loggedIn) {
+        headers.append('X-Clubhouse-Token', 'TestToken');
+      }
       let response = new Response(new ResponseOptions({
-        body: JSON.stringify(result)
+        body: JSON.stringify(result),
+        headers: headers,
       }));
       c.mockRespond(response);
     }

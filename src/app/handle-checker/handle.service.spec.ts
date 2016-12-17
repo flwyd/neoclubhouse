@@ -2,6 +2,7 @@
 
 import { TestBed, async, inject } from '@angular/core/testing';
 import { HandleService } from './handle.service';
+import { SecretClubhouseService } from '../secret-clubhouse.service';
 import { BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
 import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
@@ -25,6 +26,7 @@ describe('HandleService', () => {
           deps: [MockBackend, BaseRequestOptions],
           useFactory: (backend, options) => new Http(backend, options)
         },
+        SecretClubhouseService,
         HandleService
       ],
     });
