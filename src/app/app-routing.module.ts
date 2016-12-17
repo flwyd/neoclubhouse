@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { AuthenticatedGuard } from './auth/authenticated-guard';
 import { ClubhouseEmbedComponent } from './clubhouse-embed/clubhouse-embed.component';
 import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
 
@@ -12,7 +13,11 @@ import { HandleCheckerComponent } from './handle-checker/handle-checker.componen
  */
 const routes: Routes = [
   { path: '', children: [] },
-  { path: 'handle-checker', component: HandleCheckerComponent },
+  {
+    path: 'handle-checker',
+    component: HandleCheckerComponent,
+    canActivate: [AuthenticatedGuard],
+  },
   { path: 'clubhouse', component: ClubhouseEmbedComponent },
 ];
 

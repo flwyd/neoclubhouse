@@ -1,18 +1,24 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async } from '@angular/core/testing';
+import { async, inject, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { SimpleNotificationsModule } from 'angular2-notifications';
-import { AppComponent } from './app.component';
-import { SecretClubhouseService } from './secret-clubhouse.service';
+import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AppComponent } from './app.component';
+import { AuthService } from './auth/auth.service';
+import { AuthState } from './auth/auth-state';
+import { SecretClubhouseService } from './secret-clubhouse.service';
 
+/**
+ * Jasmine tests for application component.
+ * @see https://angular.io/docs/ts/latest/guide/testing.html
+ */
 describe('AppComponent', () => {
-  let clubhouse = null;
-
   beforeEach(() => {
-    clubhouse = {
-      getAuthState: () => new BehaviorSubject({ loggedIn: false }),
+    let authState = new BehaviorSubject(AuthState.anonymous());
+    let authService = {
+      getAuthState: () => authState,
+      getKnownAuthState: () => authState.filter((s) => s.stateKnown),
       checkAuthPeriodically: function() {},
     };
     TestBed.configureTestingModule({
@@ -27,8 +33,8 @@ describe('AppComponent', () => {
       ],
       providers: [
         {
-          provide: SecretClubhouseService,
-          useValue: clubhouse,
+          provide: AuthService,
+          useValue: authService,
         },
       ],
     });
@@ -53,12 +59,15 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('h1').textContent).toContain('Ranger Neoclubhouse');
   }));
 
-  it('should create start auth polling', async(() => {
-    spyOn(clubhouse, 'checkAuthPeriodically');
+  it('should start auth polling', async(inject([AuthService, NotificationsService],
+      (authService, notifications: NotificationsService) => {
+    spyOn(authService, 'checkAuthPeriodically');
+    spyOn(notifications, 'error');
     let fixture = TestBed.createComponent(AppComponent);
     let app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
     fixture.detectChanges();
-    expect(clubhouse.checkAuthPeriodically).toHaveBeenCalled();
-  }));
+    expect(authService.checkAuthPeriodically).toHaveBeenCalled();
+    expect(notifications.error).toHaveBeenCalled();
+  })));
 });

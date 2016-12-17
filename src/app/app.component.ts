@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
 
-import { AuthState, SecretClubhouseService } from './secret-clubhouse.service';
+import { AuthService } from './auth/auth.service';
+import { AuthState } from './auth/auth-state';
 
 /**
  * Component defining the UI shell for the whole app.  This class shouldn't accumulate a lot of
@@ -13,7 +16,7 @@ import { AuthState, SecretClubhouseService } from './secret-clubhouse.service';
 })
 export class AppComponent implements OnInit {
   title = 'Ranger Neoclubhouse';
-  authState = new AuthState();
+  authState: Observable<AuthState>;
 
   // See https://github.com/flauc/angular2-notifications/blob/master/docs/toastNotifications.md
   notificationOptions = {
@@ -21,14 +24,23 @@ export class AppComponent implements OnInit {
   };
 
   constructor(
-    private clubhouse: SecretClubhouseService
-  ) { }
+    private auth: AuthService,
+    private notifications: NotificationsService,
+  ) {
+    this.authState = auth.getAuthState();
+  }
 
   /** Put application-level initialization code here. */
   ngOnInit() {
-    this.clubhouse.getAuthState().subscribe({
-      next: (state) => this.authState = state
-    });
-    this.clubhouse.checkAuthPeriodically();
+    this.auth.getKnownAuthState()
+      .subscribe((state) =>  {
+        const id = 'not-logged-in';
+        this.notifications.remove(id);
+        if (!state.loggedIn) {
+          this.notifications.error('You are not logged in',
+            'Most Clubhouse features will be unavailable', { id: id,  });
+        }
+      });
+    this.auth.checkAuthPeriodically();
   }
 }

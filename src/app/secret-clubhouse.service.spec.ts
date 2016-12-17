@@ -1,33 +1,15 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, inject } from '@angular/core/testing';
-import { BaseRequestOptions, Headers, Http, Response, ResponseOptions } from '@angular/http';
+import { fakeAsync, inject, TestBed } from '@angular/core/testing';
+import { BaseRequestOptions, Headers, Http, Request, RequestMethod, Response, ResponseOptions } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
-import { AuthState, SecretClubhouseService } from './secret-clubhouse.service';
-import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
 
-function mockResponse(backend: MockBackend, result: any): void {
-  backend.connections.subscribe((c) => {
-    if (c.request.url.match(/DMSc=security&DMSm=authJson/)) {
-      let headers = new Headers();
-      if (result.data && result.data.loggedIn) {
-        headers.append('X-Clubhouse-Token', 'TestToken');
-      }
-      let response = new Response(new ResponseOptions({
-        body: JSON.stringify(result),
-        headers: headers,
-      }));
-      c.mockRespond(response);
-    }
-  });
-}
+import { ApiRequest, SecretClubhouseService } from './secret-clubhouse.service';
+import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
 
 describe('SecretClubhouseService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        SimpleNotificationsModule,
-      ],
       providers: [
         BaseRequestOptions,
         MockBackend,
@@ -41,58 +23,111 @@ describe('SecretClubhouseService', () => {
     });
   });
 
-  it('should report a user is not logged in', async(inject([SecretClubhouseService, MockBackend],
-    (service: SecretClubhouseService, backend: MockBackend) => {
-      expect(service).toBeTruthy();
-      mockResponse(backend, { data: { loggedIn: false } });
-      let state: AuthState = null;
-      service.getAuthState().subscribe({
-        next: (val) => state = val
-      });
-      expect(state.loggedIn).toBe(false);
-      service.checkAuth().then((result) => {
-        expect(result).toBe(false);
-        expect(state.loggedIn).toBe(false);
-      });
-    })));
+  it('should inject', inject([SecretClubhouseService], (service: SecretClubhouseService) => {
+    expect(service).toBeTruthy();
+  }));
 
-  it('should report a user is not logged in', async(inject([SecretClubhouseService, MockBackend],
-    (service: SecretClubhouseService, backend: MockBackend) => {
-      expect(service).toBeTruthy();
-      mockResponse(backend,
-        { data: { loggedIn: true, callsign: 'Danger', email: 'danger@example.com' } });
-      let state: AuthState = null;
-      service.getAuthState().subscribe({
-        next: (val) => state = val
+  it('should perform GET requests', fakeAsync(inject([SecretClubhouseService, MockBackend],
+      (service: SecretClubhouseService, backend: MockBackend) => {
+    let capturedRequest: Request;
+    let mockResponse: Response;
+    backend.connections.subscribe((c) => {
+      capturedRequest = c.request;
+      c.mockRespond(mockResponse);
+    });
+    mockResponse = new Response(new ResponseOptions({
+      status: 200,
+      body: JSON.stringify({id: 1})
+    }));
+    service.request(ApiRequest.get('foo/1'))
+      .subscribe((response) => {
+        expect(capturedRequest).toBeTruthy();
+        expect(capturedRequest.method).toBe(RequestMethod.Get);
+        expect(capturedRequest.url).toBe('/api/v0/foo/1');
+        expect(response.status).toBe(200);
+        expect(response.json().id).toBe(1);
       });
-      expect(state.loggedIn).toBe(false);
-      service.checkAuth().then((result) => {
-        expect(result).toBe(true);
-        expect(state.loggedIn).toBe(true);
-        expect(state.callsign).toBe('Danger');
-        expect(state.email).toBe('danger@example.com');
+    mockResponse = new Response(new ResponseOptions({
+      status: 400,
+      body: JSON.stringify({message: 'whiskey tango foxtrot'}),
+    }));
+    service.request(ApiRequest.get('foo/bar'))
+      .subscribe((response) => {
+        expect(capturedRequest).toBeTruthy();
+        expect(capturedRequest.method).toBe(RequestMethod.Get);
+        expect(capturedRequest.url).toBe('/api/v0/foo/bar');
+        expect(response.status).toBe(400);
+        expect(response.json().message).toBe('whiskey tango foxtrot');
       });
-    })));
+  })));
 
-  it('should show a notification on HTTP failure', async(inject([SecretClubhouseService, MockBackend, NotificationsService],
-    (service: SecretClubhouseService, backend: MockBackend, notifications) => {
-      backend.connections.subscribe((c) => {
-        if (c.request.url.match(/DMSc=security&DMSm=authJson/)) {
-          c.mockError(new Error('it failed!'));
-        }
+  it('should perform POST requests', fakeAsync(inject([SecretClubhouseService, MockBackend],
+      (service: SecretClubhouseService, backend: MockBackend) => {
+    let capturedRequest: Request;
+    let mockResponse: Response;
+    backend.connections.subscribe((c) => {
+      capturedRequest = c.request;
+      c.mockRespond(mockResponse);
+    });
+    mockResponse = new Response(new ResponseOptions({
+      status: 200,
+      body: JSON.stringify({id: 1, name: 'new value'})
+    }));
+    service.request(ApiRequest.post('foo', {}, {name: 'value'}))
+      .subscribe((response) => {
+        expect(capturedRequest).toBeTruthy();
+        expect(capturedRequest.method).toBe(RequestMethod.Post);
+        expect(capturedRequest.url).toBe('/api/v0/foo');
+        expect(capturedRequest.headers.get('Content-Type')).toBe('application/json');
+        expect(capturedRequest.json().name).toBe('value');
+        expect(response.status).toBe(200);
+        expect(response.json().id).toBe(1);
+        expect(response.json().name).toBe('new value');
       });
-      spyOn(notifications, 'error');
-      spyOn(console, 'error');
-      let state: AuthState = null;
-      service.getAuthState().subscribe({
-        next: (val) => state = val
+    mockResponse = new Response(new ResponseOptions({
+      status: 400,
+      body: JSON.stringify({message: 'whiskey tango foxtrot'}),
+    }));
+    service.request(ApiRequest.post('foo/1'))
+      .subscribe((response) => {
+        expect(capturedRequest).toBeTruthy();
+        expect(capturedRequest.method).toBe(RequestMethod.Post);
+        expect(capturedRequest.url).toBe('/api/v0/foo/1');
+        expect(response.status).toBe(400);
+        expect(response.json().message).toBe('whiskey tango foxtrot');
       });
-      expect(state.loggedIn).toBe(false);
-      service.checkAuth().then((result) => {
-        expect(notifications.error).toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalled();
-        expect(result).toBe(false);
-        expect(state.loggedIn).toBe(false);
+  })));
+
+  it('should pass parameters', fakeAsync(inject([SecretClubhouseService, MockBackend],
+      (service: SecretClubhouseService, backend: MockBackend) => {
+    let capturedRequest: Request;
+    let mockResponse: Response;
+    backend.connections.subscribe((c) => {
+      capturedRequest = c.request;
+      c.mockRespond(mockResponse);
+    });
+    mockResponse = new Response(new ResponseOptions({
+      status: 200,
+      body: JSON.stringify({id: 1})
+    }));
+  service.request(ApiRequest.post('foo/1', {year: 1999, select: 'stuff'}))
+      .subscribe((response) => {
+        expect(capturedRequest).toBeTruthy();
+        expect(capturedRequest.method).toBe(RequestMethod.Post);
+        expect(capturedRequest.url).toBe('/api/v0/foo/1?year=1999&select=stuff');
+        expect(response.status).toBe(200);
+        expect(response.json().id).toBe(1);
       });
-    })));
+    service.request(ApiRequest.get('bar',
+        {game: 'AD&D', missing: null, year: [2016, 2017]/*, obj: {a: 1, b: 'x=y'}*/}))
+      .subscribe((response) => {
+        expect(capturedRequest).toBeTruthy();
+        expect(capturedRequest.method).toBe(RequestMethod.Get);
+        expect(capturedRequest.url)
+          .toBe('/api/v0/bar?game=AD%26D&year%5B%5D=2016&year%5B%5D=2017');
+          // .toBe('/api/v0/bar?game=AD%26D&year%5B%5D=2016&year%5B%5D=2017&obj.a=1&obj.b=x%3Dy');
+        expect(response.status).toBe(200);
+        expect(response.json().id).toBe(1);
+      });
+  })));
 });

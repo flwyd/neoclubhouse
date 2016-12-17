@@ -6,11 +6,11 @@
     <a routerLink="/handle-checker" routerLinkActive="active">Handle checker</a>
   </nav>
   <nav>
-    <span *ngIf="authState.loggedIn" [title]="authState.email">
-      {{authState.callsign}}
+    <span *ngIf="(authState | async)?.loggedIn" [title]="authState.email">
+      {{(authState | async).callsign}}
       <a routerLink="/clubhouse">Log out</a>
     </span>
-    <a *ngIf="!authState.loggedIn" routerLink="/clubhouse">Log in</a>
+    <a *ngIf="!(authState | async)?.loggedIn" routerLink="/clubhouse">Log in</a>
   </nav>
 </header>
 <simple-notifications [options]="notificationOptions"></simple-notifications>

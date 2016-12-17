@@ -5,6 +5,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
+import { AuthModule } from './auth/auth.module';
 import { SecretClubhouseService } from './secret-clubhouse.service';
 import { HandleCheckerModule } from './handle-checker/handle-checker.module';
 import { ClubhouseEmbedModule } from './clubhouse-embed/clubhouse-embed.module';
@@ -22,6 +23,7 @@ import { ClubhouseEmbedModule } from './clubhouse-embed/clubhouse-embed.module';
     AppComponent,
   ],
   imports: [
+    AuthModule,
     BrowserModule,
     ClubhouseEmbedModule,
     HttpModule,
