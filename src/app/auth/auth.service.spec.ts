@@ -6,6 +6,7 @@ import { MockBackend } from '@angular/http/testing';
 
 import { AuthState } from './auth-state';
 import { AuthService } from './auth.service';
+import { Role } from './role';
 import { SecretClubhouseService } from '../secret-clubhouse.service';
 
 function mockResponse(backend: MockBackend, result: any): void {
@@ -66,8 +67,12 @@ describe('AuthService', () => {
   it('should report a user is logged in', fakeAsync(inject([AuthService, MockBackend],
       (service: AuthService, backend: MockBackend) => {
     expect(service).toBeTruthy();
-    mockResponse(backend,
-      { auth: { loggedIn: true, callsign: 'Danger', email: 'danger@example.com' } });
+    mockResponse(backend, {
+      auth: {
+        loggedIn: true, callsign: 'Danger', email: 'danger@example.com',
+        roles: ['ROLE_MENTOR', 'ROLE_TRAINER']
+      }
+    });
     let state: AuthState = null;
     service.getAuthState().subscribe({
       next: (val) => state = val
@@ -79,5 +84,7 @@ describe('AuthService', () => {
     expect(state.loggedIn).toBe(true, 'user was logged out');
     expect(state.callsign).toBe('Danger');
     expect(state.email).toBe('danger@example.com');
+    expect(state.hasRole(Role.MENTOR)).toBe(true);
+    expect(state.hasRole(Role.TRAINER)).toBe(true);
   })));
 });

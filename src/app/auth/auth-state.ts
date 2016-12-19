@@ -1,3 +1,5 @@
+import { Role } from './role';
+
 /** Authentication state for the current session. */
 export class AuthState {
   static unknown() {
@@ -7,11 +9,11 @@ export class AuthState {
     return new AuthState(false, '', '');
   }
 
-  static user(email: string, callsign: string): AuthState {
+  static user(email: string, callsign: string, roles: Role[] = []): AuthState {
     if (!email || !callsign) {
       throw `Expected user, got email: ${email}, callsign: ${callsign}`;
     }
-    return new AuthState(true, email, callsign);
+    return new AuthState(true, email, callsign, roles);
   }
 
   private constructor(
@@ -19,11 +21,14 @@ export class AuthState {
     readonly authenticated: boolean | undefined,
     readonly email: string,
     readonly callsign: string,
+    readonly roles: Role[] = [],
   ) { }
 
   get loggedIn(): boolean { return this.authenticated === true; }
 
   get stateKnown(): boolean { return this.authenticated !== undefined; }
+
+  hasRole(role: Role): boolean { return this.roles.some((r) => r.name === role.name); }
 
   toString(): string {
     switch (this.authenticated) {
@@ -32,7 +37,7 @@ export class AuthState {
       case false:
         return 'not signed in';
       case true:
-        return `signed in as ${this.callsign} / ${this.email}`;
+        return `signed in as ${this.callsign} / ${this.email} with roles ${this.roles.join(', ')}`;
     }
   }
 }

@@ -4,6 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthenticatedGuard } from './auth/authenticated-guard';
 import { ClubhouseEmbedComponent } from './clubhouse-embed/clubhouse-embed.component';
 import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
+import { HasRoleGuard } from './auth/has-role-guard';
+import { Role } from './auth/role';
 
 /**
  * Routing definitions for the app.  When building a new view, add the component here.
@@ -16,7 +18,10 @@ const routes: Routes = [
   {
     path: 'handle-checker',
     component: HandleCheckerComponent,
-    canActivate: [AuthenticatedGuard],
+    canActivate: [AuthenticatedGuard, HasRoleGuard],
+    data: {
+      allowedRoles: [Role.MANAGE],
+    },
   },
   { path: 'clubhouse', component: ClubhouseEmbedComponent },
 ];

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from '../../environments/environment';
 import { AuthState } from './auth-state';
+import { Role } from './role';
 import { ApiRequest, SecretClubhouseService } from '../secret-clubhouse.service';
 
 import 'rxjs/add/operator/filter';
@@ -47,7 +48,8 @@ export class AuthService {
         this.clubhouse.authToken = response.headers.get('X-Clubhouse-Token');
         let data = response.json().auth;
         if (data.loggedIn) {
-          this.state.next(AuthState.user(data.email, data.callsign));
+          let roles = (data.roles || []).map((r) => Role.lookup(r)).filter((r) => r !== undefined);
+          this.state.next(AuthState.user(data.email, data.callsign, roles));
           // console.debug('Logged in as', this.state.value);
         } else {
           this.state.next(AuthState.anonymous());

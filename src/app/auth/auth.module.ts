@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard } from './authenticated-guard';
+import { HasRoleGuard } from './has-role-guard';
 
 /**
  * Module configuring authentication/authorization services.
@@ -13,6 +14,7 @@ import { AuthenticatedGuard } from './authenticated-guard';
   providers: [
     AuthService,
     AuthenticatedGuard,
+    HasRoleGuard,
   ]
 })
 export class AuthModule { }
