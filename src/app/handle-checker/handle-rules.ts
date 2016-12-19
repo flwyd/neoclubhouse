@@ -476,7 +476,7 @@ export class EyeRhymeRule implements HandleRule {
     });
   }
 
-  toSyllables(text: string): Syllable[] {
+  private toSyllables(text: string): Syllable[] {
     text = text.trim();
     if (text.length === 0) {
       return [];
@@ -571,7 +571,7 @@ export const RULE_CLASSES = [
   EyeRhymeRule,
 ];
 
-export const allRulesFactory = (
+export function allRulesFactory(
   minLength: MinLengthRule,
   fcc: FccRule,
   substring: SubstringRule,
@@ -580,6 +580,6 @@ export const allRulesFactory = (
   soundex: AmericanSoundexRule,
   metaphone: DoubleMetaphoneRule,
   rhymes: EyeRhymeRule,
-): HandleRule[] => {
+): HandleRule[] {
   return [minLength, fcc, substring, editDistance, nato, soundex, metaphone, rhymes];
 };

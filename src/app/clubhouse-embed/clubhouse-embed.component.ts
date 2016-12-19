@@ -20,7 +20,7 @@ export class ClubhouseEmbedComponent implements OnInit {
    * The Clubhouse URL to show.  Don't allow arbitrary or untrusted user input.
    * @see https://angular.io/docs/ts/latest/guide/security.html#!#xss
    */
-  private clubhouseUri: SafeUrl;
+  clubhouseUri: SafeUrl;
 
   constructor(
     private sanitizer: DomSanitizer

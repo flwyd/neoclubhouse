@@ -14,17 +14,17 @@ export class ApiRequest {
     return new ApiRequest(RequestMethod.Get, path, parameters);
   }
 
-  static post(path: string, parameters = {}, body: any = undefined,
+  static post(path: string, parameters = {}, body: any = null,
       contentType = 'application/json'): ApiRequest {
     return new ApiRequest(RequestMethod.Post, path, parameters, body, contentType);
   }
 
-  static put(path: string, parameters = {}, body: any = undefined,
+  static put(path: string, parameters = {}, body: any = null,
       contentType = 'application/json'): ApiRequest {
     return new ApiRequest(RequestMethod.Put, path, parameters, body, contentType);
   }
 
-  static patch(path: string, parameters = {}, body: any = undefined,
+  static patch(path: string, parameters = {}, body: any = null,
       contentType = 'application/json'): ApiRequest {
     return new ApiRequest(RequestMethod.Patch, path, parameters, body, contentType);
   }
@@ -37,7 +37,7 @@ export class ApiRequest {
     public method: RequestMethod,
     public path: string,
     public parameters = {},
-    public body: any = undefined,
+    public body: any = null,
     public contentType: string = null,
   ) { }
 }
