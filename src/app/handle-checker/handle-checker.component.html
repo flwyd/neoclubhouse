@@ -7,7 +7,7 @@
       (click)="clearCheckedNames(); handleCheckInput.focus()">Clear checked handles</button>
   <br />
   Rules:
-  <label *ngFor="let state of ruleState" class="rule-select">
+  <label *ngFor="let state of ruleStates" class="rule-select">
     <input type="checkbox" name="rule_{{state.rule.id}}" [(ngModel)]="state.active">
     {{state.name}}
   </label>
@@ -26,9 +26,10 @@
       <td class="handle-conflicts">
         <ul *ngIf="checked.conflicts.length > 0" class="handle-conflict-list">
           <li *ngFor="let conflict of checked.conflicts"
-              [ngClass]="conflictClasses(conflict)"
+              [ngClass]="conflict.classes"
               [@tableInsert]="'in'"
-              [title]="conflictTip(conflict)">
+              [@ruleStateDisplay]="conflict.ruleState.active"
+              [title]="conflict.toolTip">
             {{conflict.description}}
           </li>
         </ul>

@@ -1,5 +1,6 @@
-import { Component, Inject, Input, OnInit,
-  animate, state, style, transition, trigger } from '@angular/core';
+import {
+  Component, Inject, Input, OnInit, animate, state, style, transition, trigger
+} from '@angular/core';
 
 import { Handle } from './handle';
 import { HandleConflict } from './handle-conflict';
@@ -18,6 +19,46 @@ const RULE_NAMES = {
   'substring': 'Substring match',
 };
 
+export class RuleState {
+  active = true;
+
+  constructor(
+    public rule: HandleRule,
+  ) { }
+
+  get name(): string { return RULE_NAMES[this.rule.id] || this.rule.id; }
+}
+
+export class ConflictViewModel {
+  description: string;
+  toolTip: string = '';
+  classes: string[];
+
+  constructor(
+    hc: HandleConflict,
+    public ruleState: RuleState
+  ) {
+    this.description = hc.description;
+    this.classes = [
+      `handle-conflict-priority-${hc.priority}`,
+      `handle-conflict-rule-${hc.ruleId}`,
+    ];
+    if (hc.conflict) {
+      this.toolTip =
+        `Conflict with ${hc.conflict.type} handle ${hc.conflict.name} (${ruleState.name})`;
+      let handleType = hc.conflict.type.toLowerCase().replace(/\W+/, '-');
+      this.classes.push(`handle-conflict-type-${handleType}`);
+    }
+  }
+}
+
+export class CheckViewModel {
+  constructor(
+    public name: string,
+    public conflicts: ConflictViewModel[] = []
+  ) { }
+}
+
 /**
  * View for the Ranger handle checker.  Loads a list of {@link HandleRule}s and presents a form for
  * entering prospective handles.  Each rule applies its own logic and returns a list of potential
@@ -31,76 +72,63 @@ const RULE_NAMES = {
   styleUrls: ['./handle-checker.component.scss'],
   animations: [
     trigger('tableInsert', [
-      state('in', style({opacity: 1})),
-      transition(':enter', [style({opacity: 0}), animate(200)]),
-    ])
+      state('in', style({ opacity: 1 })),
+      transition(':enter', [style({ opacity: 0 }), animate(200)]),
+    ]),
+    trigger('ruleStateDisplay', [
+      state('true', style({
+        display: 'inline',
+      })),
+      state('false', style({
+        display: 'none',
+      })),
+      transition('true <=> false', animate(100)),
+    ]),
   ],
 })
 export class HandleCheckerComponent implements OnInit {
   /** All known handles and reserved words. */
   handles: Handle[] = [];
   /** Prospective handles which have been checked in this session. */
-  checkedNames: {name: string, conflicts: HandleConflict[]}[] = [];
+  checkedNames: CheckViewModel[] = [];
   /** The name being entered or checked (bound to an input field). */
   @Input() currentName = '';
   /** Enabled/disabled state for each rule.  If !active, the rule won't be asked for conflicts. */
-  @Input() ruleState: { rule: HandleRule, name: string, active: boolean }[] = [];
+  @Input() ruleStates: RuleState[] = [];
 
   constructor(
-      private handleService: HandleService,
-      @Inject(ALL_HANDLE_RULES) private allRules: HandleRule[]) {
+    private handleService: HandleService,
+    @Inject(ALL_HANDLE_RULES) private allRules: HandleRule[]) {
   }
 
   ngOnInit() {
     // TODO observable
     this.handleService.getHandles().then(handles => this.handles = handles);
-    this.ruleState = this.allRules.map((rule) => {
-      return {rule: rule, name: RULE_NAMES[rule.id] || rule.id, active: true};
-    }).sort((a, b) => a.name < b.name ? -1 : 1);
+    this.ruleStates = this.allRules.map((rule) => new RuleState(rule))
+      .sort((a, b) => a.name < b.name ? -1 : 1);
   }
 
   /**
    * Check {@link currentName} against each active rule, appending results to {@link checkedNames}.
    */
-  checkCurrentName(): void {
+  checkCurrentName(): Promise<void> {
     let name = this.currentName.trim();
     if (name === '') {
       return;
     }
-    let promises = [];
-    for (let state of this.ruleState) {
-      if (state.active) {
-        promises.push(state.rule.check(name));
-      }
-    }
-    Promise.all(promises).then((conflicts: HandleConflict[][]) => {
-      let all = conflicts.reduce((acc, l) => acc.concat(l), []);
-      this.checkedNames.unshift({name: name, conflicts: all});
-    });
     this.currentName = '';
+    let promises = [];
+    for (let state of this.ruleStates) {
+      promises.push(state.rule.check(name)
+        .then((conflicts) => conflicts.map((c) => new ConflictViewModel(c, state))));
+    }
+    return Promise.all(promises).then((conflicts: ConflictViewModel[]) => {
+      let all = conflicts.reduce((acc, l) => acc.concat(l), []);
+      this.checkedNames.unshift(new CheckViewModel(name, all));
+    });
   }
 
   clearCheckedNames(): void {
     this.checkedNames.splice(0);
-  }
-
-  /** Tool tip for a {@link HandleConflict}. */
-  conflictTip(c: HandleConflict): string {
-    return c.conflict ?
-      `Conflict with ${c.conflict.type} handle ${c.conflict.name} (${RULE_NAMES[c.ruleId]})`
-      : '';
-  }
-
-  /** List of CSS classes to apply to a {@link HandleConflict}. */
-  conflictClasses(conflict: HandleConflict): string[] {
-    let classes = [
-      `handle-conflict-priority-${conflict.priority}`,
-      `handle-conflict-rule-${conflict.ruleId}`,
-    ];
-    if (conflict.conflict) {
-      let handleType = conflict.conflict.type.toLowerCase().replace(/\W+/, '-');
-      classes.push(`handle-conflict-type-${handleType}`);
-    }
-    return classes;
   }
 }

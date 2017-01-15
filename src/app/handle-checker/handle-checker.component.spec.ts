@@ -13,12 +13,12 @@ import { HandleService } from './handle.service';
 import { MockHandleService } from './handle.service.mock';
 
 // TODO consider extracting these utility methods somewhere common
-function findElement(ancestor: DebugElement|ComponentFixture<any>, selector: string): DebugElement {
+function findElement(ancestor: DebugElement | ComponentFixture<any>, selector: string): DebugElement {
   let debugElement = ancestor instanceof DebugElement ? ancestor : ancestor.debugElement;
   return debugElement.query(By.css(selector));
 }
 
-function findElements(ancestor: DebugElement|ComponentFixture<any>, selector: string): DebugElement[] {
+function findElements(ancestor: DebugElement | ComponentFixture<any>, selector: string): DebugElement[] {
   let debugElement = ancestor instanceof DebugElement ? ancestor : ancestor.debugElement;
   return debugElement.queryAll(By.css(selector));
 }
@@ -113,17 +113,19 @@ describe('HandleCheckerComponent', () => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
       component.currentName = 'foxy';
-      component.checkCurrentName();
-      component.currentName = 'unicorn';
-      component.checkCurrentName();
-      fixture.whenStable().then(() => {
-        fixture.detectChanges();
-        let rows = findElements(table, '.handle-row');
-        expect(rows.length).toBe(2);
-        clearButton.nativeElement.click();
-        fixture.whenStable().then(() => {
-          fixture.detectChanges();
-          expect(findElements(table, '.handle-row').length).toBe(0);
+      component.checkCurrentName().then(() => {
+        component.currentName = 'unicorn';
+        component.checkCurrentName().then(() => {
+          fixture.whenStable().then(() => {
+            fixture.detectChanges();
+            let rows = findElements(table, '.handle-row');
+            expect(rows.length).toBe(2);
+            clearButton.nativeElement.click();
+            fixture.whenStable().then(() => {
+              fixture.detectChanges();
+              expect(findElements(table, '.handle-row').length).toBe(0);
+            });
+          });
         });
       });
     });
