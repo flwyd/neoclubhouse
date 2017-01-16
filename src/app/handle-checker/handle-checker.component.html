@@ -24,15 +24,25 @@
     <tr *ngFor="let checked of checkedNames" class="handle-row">
       <td class="handle-name">{{checked.name}}</td>
       <td class="handle-conflicts">
-        <ul *ngIf="checked.conflicts.length > 0" class="handle-conflict-list">
-          <li *ngFor="let conflict of checked.conflicts"
-              [ngClass]="conflict.classes"
-              [@tableInsert]="'in'"
-              [@ruleStateDisplay]="conflict.ruleState.active"
-              [title]="conflict.toolTip">
-            {{conflict.description}}
-          </li>
-        </ul>
+        <div *ngIf="checked.conflicts.length > 0" class="handle-conflict-list">
+          <ng-container *ngFor="let conflict of checked.conflicts">
+            <div *ngIf="conflict.ruleState.active"
+                class="conflict-card"
+                [ngClass]="conflict.classes"
+                [@tableInsert]="'in'"
+                (click)="toggleExpanded"
+                [title]="conflict.toolTip">
+              <span class="conflict-title">{{conflict.title}}</span>
+              <span *ngIf="conflict.counterpart" class="conflict-counterpart-type">
+                {{conflict.counterpart.type}}
+              </span>
+              <span class="conflict-description">
+                {{conflict.ruleState.name}}: {{conflict.description}}
+              </span>
+            </div>
+          </ng-container>
+        </div>
+      </td>
     </tr>
   </tbody>
 </table>

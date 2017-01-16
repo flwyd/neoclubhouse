@@ -99,6 +99,7 @@ describe('HandleCheckerComponent', () => {
         let nameCell = findElement(row, '.handle-name');
         expect(nameCell.nativeElement.textContent).toBe('nov');
         let substringConflict = findElement(row, '.handle-conflict-rule-substring');
+        expect(substringConflict).toBeTruthy('no substring conflict for nov');
         expect(substringConflict.nativeElement.textContent).toMatch('November');
         expect(inputEl.textContent).toBe(''); // submit clears input
       });

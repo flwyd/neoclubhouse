@@ -2,6 +2,8 @@ import { Handle } from './handle';
 
 export type ConflictPriority = 'low' | 'medium' | 'high';
 
+export const PRIORITY_ORDER = {'high': 1, 'medium': 2, 'low': 3};
+
 /** Represents a potential conflict with a proposed handle. */
 export class HandleConflict {
   constructor(

@@ -3,9 +3,11 @@ import {
 } from '@angular/core';
 
 import { Handle } from './handle';
-import { HandleConflict } from './handle-conflict';
+import { ConflictPriority, HandleConflict, PRIORITY_ORDER } from './handle-conflict';
 import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
 import { HandleService } from './handle.service';
+
+const _ = require('lodash');
 
 /** Mapping from {@link HandleRule#id} to display string. */
 const RULE_NAMES = {
@@ -29,34 +31,74 @@ export class RuleState {
   get name(): string { return RULE_NAMES[this.rule.id] || this.rule.id; }
 }
 
+/** View model for a single name conflict. */
 export class ConflictViewModel {
+  title: string;
   description: string;
-  toolTip: string = '';
+  toolTip: string;
+  counterpart: Handle;
+  priority: ConflictPriority;
   classes: string[];
+  priorityClass: string;
+  ruleClass: string;
+  handleTypeClass: string;
+  expanded = false;
 
   constructor(
     hc: HandleConflict,
     public ruleState: RuleState
   ) {
     this.description = hc.description;
+    this.priority = hc.priority;
     this.classes = [
       `handle-conflict-priority-${hc.priority}`,
       `handle-conflict-rule-${hc.ruleId}`,
     ];
     if (hc.conflict) {
+      this.counterpart = hc.conflict;
+      this.title = hc.conflict.name;
       this.toolTip =
         `Conflict with ${hc.conflict.type} handle ${hc.conflict.name} (${ruleState.name})`;
       let handleType = hc.conflict.type.toLowerCase().replace(/\W+/, '-');
       this.classes.push(`handle-conflict-type-${handleType}`);
+    } else {
+      this.title = ruleState.name;
+      this.toolTip = ruleState.name;
+    }
+  }
+
+  toggleExpanded() {
+    this.expanded = !this.expanded;
+    if (this.expanded) {
+      this.classes.push('expanded');
+    } else {
+      let i = this.classes.indexOf('expanded');
+      if (i >= 0) {
+        this.classes.splice(i, 1);
+      }
     }
   }
 }
 
+/** View model for all conflicts found for a potential handle. */
 export class CheckViewModel {
+  conflicts: ConflictViewModel[];
+
   constructor(
     public name: string,
-    public conflicts: ConflictViewModel[] = []
-  ) { }
+    conflicts: ConflictViewModel[] = []
+  ) {
+    this.conflicts = _.sortBy(conflicts, [
+      // first by priority
+      (x) => PRIORITY_ORDER[x.priority],
+      // second, put conflicts first if they don't match a specific existing handle
+      (x) => !!x.counterpart,
+      // third by title
+      (x) => x.title.toLowerCase(),
+      // if two entities share a handle, resolve by handle type
+      (x) => x.counterpart ? x.counterpart.type : ''
+    ]);
+  }
 }
 
 /**

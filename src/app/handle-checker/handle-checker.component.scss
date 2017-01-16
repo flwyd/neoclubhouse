@@ -13,26 +13,42 @@ table.checked-handles {
       right: 0.5ex;
     }
   }
+
+  td.handle-name {
+    padding: 0.5ex;
+    vertical-align: top;
+  }
 }
 
-ul.handle-conflict-list {
+.handle-conflict-list {
   padding-left: 0;
 
-  li {
+  .conflict-card {
+    cursor: pointer;
     display: inline-block;
-    margin-right: 2ex;
+    margin-right: 1em;
+    padding: 0.5ex;
+    vertical-align: top;
 
-    &:before {
-      content: "‣";
+    .conflict-title {
+      display: inline;
+      font-weight: bolder;
+    }
+    .conflict-counterpart-type {
+      display: inline;
+    }
+    .conflict-description {
+      display: none;
+    }
+    &.expanded {
+      .conflict-description {
+        display: block;
+      }
     }
   }
 
-  .handle-conflict-priority-high {
-    font-weight: bolder;
-  }
-
-  .handle-conflict-type-retired-ranger {
-    text-decoration: line-through;
+  .handle-conflict-priority-high .conflict-title {
+    font-style: italic;
   }
 }
 
