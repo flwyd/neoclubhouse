@@ -30,9 +30,18 @@
                 class="conflict-card"
                 [ngClass]="conflict.classes"
                 [@tableInsert]="'in'"
-                (click)="toggleExpanded"
+                (click)="conflict.toggleExpanded()"
                 [title]="conflict.toolTip">
-              <span class="conflict-title">{{conflict.title}}</span>
+              <span class="conflict-title">
+                <ng-container [ngSwitch]="!!conflict.personUri">
+                  <a *ngSwitchCase="true"
+                    class="handle-link"
+                    [href]="conflict.personUri"
+                    target="_blank"
+                    >{{conflict.title}}</a>
+                  <ng-container *ngSwitchDefault>{{conflict.title}}</ng-container>
+                </ng-container>
+              </span>
               <span *ngIf="conflict.counterpart" class="conflict-counterpart-type">
                 {{conflict.counterpart.type}}
               </span>

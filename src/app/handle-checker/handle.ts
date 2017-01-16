@@ -3,12 +3,6 @@
  * radio channels.
  */
 export class Handle {
-  name: string;
-  type: string;
-  // TODO make type an enum or string disjunction?
-  // TODO subtype, e.g. active/vintage/inactive
-  // TODO add a priority field?
-
   static comparator(a: Handle, b: Handle) {
     // TODO use comparators npm module
     let nameA = a.name.toUpperCase();
@@ -21,4 +15,14 @@ export class Handle {
     }
     return nameA < nameB ? -1 : 1;
   }
+
+  // TODO make type an enum or string disjunction?
+  // TODO subtype, e.g. active/vintage/inactive
+  // TODO add a priority field?
+
+  constructor(
+    public readonly name: string,
+    public readonly type: string,
+    public readonly personId = 0
+  ) { }
 }

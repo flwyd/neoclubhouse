@@ -33,6 +33,10 @@ table.checked-handles {
     .conflict-title {
       display: inline;
       font-weight: bolder;
+
+      a {
+        color: black;
+      }
     }
     .conflict-counterpart-type {
       display: inline;

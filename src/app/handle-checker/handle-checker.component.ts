@@ -6,6 +6,7 @@ import { Handle } from './handle';
 import { ConflictPriority, HandleConflict, PRIORITY_ORDER } from './handle-conflict';
 import { ALL_HANDLE_RULES, HandleRule } from './handle-rule';
 import { HandleService } from './handle.service';
+import { dmsUri } from '../secret-clubhouse';
 
 const _ = require('lodash');
 
@@ -38,10 +39,8 @@ export class ConflictViewModel {
   toolTip: string;
   counterpart: Handle;
   priority: ConflictPriority;
+  personUri: string;
   classes: string[];
-  priorityClass: string;
-  ruleClass: string;
-  handleTypeClass: string;
   expanded = false;
 
   constructor(
@@ -61,6 +60,9 @@ export class ConflictViewModel {
         `Conflict with ${hc.conflict.type} handle ${hc.conflict.name} (${ruleState.name})`;
       let handleType = hc.conflict.type.toLowerCase().replace(/\W+/, '-');
       this.classes.push(`handle-conflict-type-${handleType}`);
+      if (hc.conflict.personId > 0) {
+        this.personUri = dmsUri('person', 'select', {personId: hc.conflict.personId});
+      }
     } else {
       this.title = ruleState.name;
       this.toolTip = ruleState.name;
@@ -116,15 +118,6 @@ export class CheckViewModel {
     trigger('tableInsert', [
       state('in', style({ opacity: 1 })),
       transition(':enter', [style({ opacity: 0 }), animate(200)]),
-    ]),
-    trigger('ruleStateDisplay', [
-      state('true', style({
-        display: 'inline',
-      })),
-      state('false', style({
-        display: 'none',
-      })),
-      transition('true <=> false', animate(100)),
     ]),
   ],
 })

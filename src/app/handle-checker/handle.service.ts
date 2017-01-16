@@ -40,7 +40,8 @@ export class HandleService {
   private fetchHandles(): Promise<Handle[]> {
     return this.clubhouse.request(ApiRequest.get('handles'))
       .toPromise()
-      .then((response) => response.json().data as Handle[])
+      .then((response) =>
+        response.json().data.map((h) => new Handle(h.name, h.type, h.person ? h.person.id : 0)))
       .catch((err) => {
         if (err) {
           console.error(`Error loading handles: ${err}`);
