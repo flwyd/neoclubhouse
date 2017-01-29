@@ -38,24 +38,25 @@ describe('AppComponent', () => {
         },
       ],
     });
+    TestBed.compileComponents();
   });
 
   it('should create the app', async(() => {
-    let fixture = TestBed.createComponent(AppComponent);
-    let app = fixture.debugElement.componentInstance;
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   }));
 
   it(`should have as title 'app works!'`, async(() => {
-    let fixture = TestBed.createComponent(AppComponent);
-    let app = fixture.debugElement.componentInstance;
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('Ranger Neoclubhouse');
   }));
 
   it('should render title in a h1 tag', async(() => {
-    let fixture = TestBed.createComponent(AppComponent);
+    const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    let compiled = fixture.debugElement.nativeElement;
+    const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toContain('Ranger Neoclubhouse');
   }));
 
@@ -63,8 +64,8 @@ describe('AppComponent', () => {
       (authService, notifications: NotificationsService) => {
     spyOn(authService, 'checkAuthPeriodically');
     spyOn(notifications, 'error');
-    let fixture = TestBed.createComponent(AppComponent);
-    let app = fixture.debugElement.componentInstance;
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
     fixture.detectChanges();
     expect(authService.checkAuthPeriodically).toHaveBeenCalled();

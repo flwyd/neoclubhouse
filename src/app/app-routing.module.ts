@@ -5,7 +5,7 @@ import { AuthenticatedGuard } from './auth/authenticated-guard';
 import { ClubhouseEmbedComponent } from './clubhouse-embed/clubhouse-embed.component';
 import { HandleCheckerComponent } from './handle-checker/handle-checker.component';
 import { HasRoleGuard } from './auth/has-role-guard';
-import { Role } from './auth/role';
+import { RoleNames } from './auth/role';
 
 /**
  * Routing definitions for the app.  When building a new view, add the component here.
@@ -20,7 +20,7 @@ const routes: Routes = [
     component: HandleCheckerComponent,
     canActivate: [AuthenticatedGuard, HasRoleGuard],
     data: {
-      allowedRoles: [Role.MANAGE],
+      allowedRoles: [RoleNames.MANAGE],
     },
   },
   { path: 'clubhouse', component: ClubhouseEmbedComponent },

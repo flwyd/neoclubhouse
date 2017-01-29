@@ -72,11 +72,11 @@ export class SecretClubhouseService {
             }
           } else if (value) {
             // TODO convert objects to dotted notation (recursively?)
-            throw `Don't know how to URL-encode object ${value} for ${name}`;
+            throw new Error(`Don't know how to URL-encode object ${value} for ${name}`);
           }
           break; // ignore null
         case 'function':
-          throw `Don't know how to URL-encode function ${value} for ${name}`;
+          throw new Error(`Don't know how to URL-encode function ${value} for ${name}`);
         case 'undefined':
           break; // ignore
       }

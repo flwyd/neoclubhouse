@@ -17,7 +17,7 @@ import 'rxjs/add/operator/map';
  *   path: 'training',
  *   component: TrainingComponent,
  *   canActivate: [HasRoleGuard],
- *   data: { allowedRoles: [Role.MENTOR.name, Role.TRAINER.name] }
+ *   data: { allowedRoles: [RoleNames.MENTOR, RoleNames.TRAINER] }
  *  }
  * @see https://angular.io/docs/ts/latest/guide/router.html#!#guards
  */

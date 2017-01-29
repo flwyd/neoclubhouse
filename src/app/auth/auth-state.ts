@@ -11,7 +11,7 @@ export class AuthState {
 
   static user(email: string, callsign: string, roles: Role[] = []): AuthState {
     if (!email || !callsign) {
-      throw `Expected user, got email: ${email}, callsign: ${callsign}`;
+      throw new Error(`Expected user, got email: ${email}, callsign: ${callsign}`);
     }
     return new AuthState(true, email, callsign, roles);
   }

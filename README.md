@@ -36,7 +36,7 @@ then run `ng serve --proxy-config local-config/local.conf.json` and requests des
 
 ## Code scaffolding
 
-Run `ng generate module component-name` to generate a new component with a module for dependency injection. You can also use `ng generate directive/pipe/service/class`.  When adding a new view, be sure to edit `app-routing.module.ts`.
+Run `ng generate component component-name` to generate a new component with a module for dependency injection. You can also use `ng generate directive/pipe/service/class/module`.  When adding a new view, be sure to edit `app-routing.module.ts`.
 
 ## Build
 
@@ -53,4 +53,4 @@ Before running the tests make sure you are serving the app via `ng serve`.
 
 ## Further help
 
-To get more help on the `angular-cli` use `ng --help` or go check out the [Angular-CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+To get more help on the `angular-cli` use `ng help` or go check out the [Angular-CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

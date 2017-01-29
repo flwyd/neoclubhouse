@@ -2,28 +2,6 @@
 export class Role {
   private static mapping: {[name: string]: Role} = {};
 
-  /**
-   * Administrator; access to most functionality.  When a more specific role exists, check that;
-   * for instance, the API knows that ADMIN implies GRANT_POSITION.
-   */
-  static ADMIN = new Role('ROLE_ADMIN');
-  /** Can set roles for users. */
-  static GRANT_POSITION = new Role('ROLE_GRANT_POSITION');
-  /** Can view other users and do a wide variety of tasks.  HQ Window users have this role. */
-  static MANAGE = new Role('ROLE_MANAGE');
-  /** Mentor Cadre; access to alpha and mentoring tools. */
-  static MENTOR = new Role('ROLE_MENTOR');
-  /** Trainer; access to reports and tools for trainings. */
-  static TRAINER = new Role('ROLE_TRAINER');
-  /** All users have this role; basically equivalent to "is signed in." */
-  static USER = new Role('ROLE_USER');
-  /** Volunteer coordinator; access to new volunteer intake tools and others. */
-  static VC = new Role('ROLE_VC');
-  /** Allowed to see other users' email addresses. */
-  static VIEW_EMAIL = new Role('ROLE_VIEW_EMAIL');
-  /** Allowed to see other users' personal information like home address. */
-  static VIEW_PII = new Role('ROLE_VIEW_PII');
-
   static lookup(role: string | Role): Role | undefined {
     return role instanceof Role ? role : Role.mapping[role];
   }
@@ -36,3 +14,40 @@ export class Role {
 
   toString(): string { return this.name; }
 }
+
+
+export const RoleNames = {
+  ADMIN: 'ROLE_ADMIN',
+  GRANT_POSITION: 'ROLE_GRANT_POSITION',
+  MANAGE: 'ROLE_MANAGE',
+  MENTOR: 'ROLE_MENTOR',
+  TRAINER: 'ROLE_TRAINER',
+  USER: 'ROLE_USER',
+  VC: 'ROLE_VC',
+  VIEW_EMAIL: 'ROLE_VIEW_EMAIL',
+  VIEW_PII: 'ROLE_VIEW_PII',
+};
+
+export const Roles = {
+/**
+ * Administrator, access to most functionality.  When a more specific role exists, check that;
+ * for instance, the API knows that ADMIN implies GRANT_POSITION.
+ */
+  ADMIN: new Role(RoleNames.ADMIN),
+/** Can set roles for users. */
+  GRANT_POSITION: new Role(RoleNames.GRANT_POSITION),
+/** Can view other users and do a wide variety of tasks.  HQ Window users have this role. */
+  MANAGE: new Role(RoleNames.MANAGE),
+/** Mentor Cadre, access to alpha and mentoring tools. */
+  MENTOR: new Role(RoleNames.MENTOR),
+/** Trainer, access to reports and tools for trainings. */
+  TRAINER: new Role(RoleNames.TRAINER),
+/** All users have this role, basically equivalent to "is signed in." */
+  USER: new Role(RoleNames.USER),
+/** Volunteer coordinator, access to new volunteer intake tools and others. */
+  VC: new Role(RoleNames.VC),
+/** Allowed to see other users' email addresses. */
+  VIEW_EMAIL: new Role(RoleNames.VIEW_EMAIL),
+/** Allowed to see other users' personal information like home address. */
+  VIEW_PII: new Role(RoleNames.VIEW_PII),
+};

@@ -6,7 +6,7 @@ import { MockBackend } from '@angular/http/testing';
 
 import { AuthState } from './auth-state';
 import { AuthService } from './auth.service';
-import { Role } from './role';
+import { Role, Roles } from './role';
 import { SecretClubhouseService } from '../secret-clubhouse.service';
 
 function mockResponse(backend: MockBackend, result: any): void {
@@ -84,7 +84,7 @@ describe('AuthService', () => {
     expect(state.loggedIn).toBe(true, 'user was logged out');
     expect(state.callsign).toBe('Danger');
     expect(state.email).toBe('danger@example.com');
-    expect(state.hasRole(Role.MENTOR)).toBe(true);
-    expect(state.hasRole(Role.TRAINER)).toBe(true);
+    expect(state.hasRole(Roles.MENTOR)).toBe(true);
+    expect(state.hasRole(Roles.TRAINER)).toBe(true);
   })));
 });

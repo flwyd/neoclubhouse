@@ -522,13 +522,13 @@ export class EyeRhymeRule implements HandleRule {
           coda = clusters.pop();
           nucleus = clusters.pop();
           if (!this.vowelsOnly(nucleus)) {
-            throw `Unexpected consonant nucleus in ${word}`;
+            throw new Error(`Unexpected consonant nucleus in ${word}`);
           }
         }
         if (clusters.length === 1) {
           onset = clusters.pop();
           if (this.vowelsOnly(onset)) {
-            throw `Unexpected vowel onset in ${word}`;
+            throw new Error(`Unexpected vowel onset in ${word}`);
           }
         } else if (clusters.length > 2) {
           let split = this.splitConsonants(clusters.pop());
@@ -545,7 +545,7 @@ export class EyeRhymeRule implements HandleRule {
 
   private splitConsonants(s: string): string[] {
     if (s.length === 0 || this.vowelsOnly(s)) {
-      throw `Expected consonants, got ${s}`;
+      throw new Error(`Expected consonants, got ${s}`);
     }
     if (s.length === 1) {
       // TODO take surrounding clusters into account
